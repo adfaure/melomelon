@@ -8,7 +8,7 @@ var webpack = require("webpack"),
   // WriteFilePlugin = require("write-file-webpack-plugin");
   ;
 
-var fileExtensions = ["jpg", "jpeg", "png", "gif", "eot", "otf", "svg", "ttf", "woff", "woff2"];
+var fileExtensions = ["jpg", "jpeg", "png", "gif", "eot", "otf", "svg", "ttf", "woff", "woff2", "css"];
 
 var options = {
   resolve: {
@@ -18,12 +18,21 @@ var options = {
   watch: true,
   entry: {
     // popup: path.join(__dirname, "src", "js", "popup.js"),
-    interface: path.join(__dirname, "src", "js", "interface.js"),
+    popup: path.join(__dirname, "src", "js", "popup.js"),
+    settings: path.join(__dirname, "src", "js", "settings.js"),
     background: path.join(__dirname, "src", "js", "background.js")
   },
   output: {
     path: path.join(__dirname, "build"),
     filename: "[name].bundle.js"
+  },
+  module: {
+    rules: [
+      {
+        test: /\.css$/i,
+        use: ["style-loader", "css-loader"],
+      },
+    ],
   },
   devtool: 'cheap-module-source-map',
   plugins: [
@@ -33,16 +42,20 @@ var options = {
       cleanStaleWebpackAssets: false
     }),
     new CopyPlugin({
-
       patterns: [
         { from: "src/manifest.json", to: "." },
       ],
     }),
     new HtmlWebpackPlugin({
-       template: path.join(__dirname, "src", "html", "interface.html"),
-       filename: "interface.html",
-       chunks: ["interface"]
+       template: path.join(__dirname, "src", "html", "popup.html"),
+       filename: "popup.html",
+       chunks: ["popup"]
     }),
+    new HtmlWebpackPlugin({
+      template: path.join(__dirname, "src", "html", "settings.html"),
+      filename: "settings.html",
+      chunks: ["settings"]
+   }),
     // new HtmlWebpackPlugin({
     //   template: path.join(__dirname, "src", "options.html"),
     //   filename: "options.html",

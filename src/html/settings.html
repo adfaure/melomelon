@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html>
+  <head>
+  </head>
+
+  <body>
+    <h1>Getting started</h1>
+    <h2>Register the bot on twitch</h2>
+    <p>
+      First, register the bot using the following <a href="https://twitchapps.com/tmi/" target="_blank">link</a>.
+      After this step, you should have an access token for the bot, keep it and don't communicate it to anyone.
+      It will be used, to connect the bot to twitch.
+
+      More information about bots <a href="https://dev.twitch.tv/docs/irc">here</a>.
+    </p>
+
+    <h2>Configuration of the bot</h2>
+
+    <form action="" method="get" class="form-settings">
+      <div class="form-settings">
+        <label for="bot-username">Bo user's account</label>
+        <input type="text" name="bot-username" id="bot-username" required>
+      </div>
+      <div class="form-settings">
+        <label for="bot-token">Connection token (keep it secret!)</label>
+        <input type="password" name="bot-token" id="bot-token"required>
+      </div>
+      <div class="form-settings">
+        <label for="channel">Channel</label>
+        <input type="text" name="bot-channel" id="bot-channel" required>
+      </div>
+      <div class="form-settings">
+        <input type="submit" value="Save settings" id="submit">
+        <input type="submit" value="Clear settings" id="clear">
+      </div>
+    </form>
+  </body>
+
+</html>

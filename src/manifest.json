@@ -10,6 +10,6 @@
         "service_worker": "background.bundle.js"
     },
     "action": {
-        "default_popup": "interface.html"
+        "default_popup": "popup.html"
       }
 }

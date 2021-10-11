@@ -15,10 +15,10 @@ document.addEventListener('DOMContentLoaded', function (event) {
     chrome.runtime.sendMessage({type: "close-youtube"});
   })
 
-  var urlButton = document.getElementById('getUrl');
+  var settingsButton = document.getElementById('settingsButton');
   // onClick's logic below:
-  urlButton.addEventListener('click', function () {
-    chrome.runtime.sendMessage({type: "get-current-url"});
+  settingsButton.addEventListener('click', function () {
+    chrome.runtime.sendMessage({type: "open-settings"});
   })
 
 });
