@@ -8,32 +8,43 @@ commands_list = ["!song"]
 chrome.runtime.onStartup.addListener(initExtension);
 chrome.runtime.onInstalled.addListener(initExtension);
 
+  // Called every time a message comes in
+  async function onMessageHandler(target, context, msg, self) {
+    if (self) { return; } // Ignore messages from the bot
+    console.log(target, context, msg, self);
+
+    // Remove whitespace from chat message
+    const commandName = msg.trim();
+
+    // If the command is known, let's execute it
+    if (commands_list.includes(commandName)) {
+      if (controlled_tab == null) {
+        console.log("bot not ready")
+      } else {
+        tab = await chrome.tabs.get(controlled_tab.id)
+        twitch_client.say(target, `Currently playing: ${tab.title} (${tab.url})`);
+      }
+    } else {
+      console.log(`* Unknown command ${commandName}`);
+    }
+  }
+
 async function initExtension() {
 
-  result = chrome.storage.local.get('chat-commands', function (result) {
+  chrome.storage.local.get('chat-commands', function (result) {
     commands_list = result["chat-commands"] ? result["chat-commands"].split(",") : commands_list;
     console.log("commands: ", result)
     console.log(commands_list)
 
-    // Called every time a message comes in
-    async function onMessageHandler(target, context, msg, self) {
-      if (self) { return; } // Ignore messages from the bot
-
-      // Remove whitespace from chat message
-      const commandName = msg.trim();
-
-      // If the command is known, let's execute it
-      if (commands_list.includes(commandName)) {
-        if (controlled_tab == null) {
-          console.log("bot not ready")
-        } else {
-          tab = await chrome.tabs.get(controlled_tab.id)
-          client.say(target, `Currently playing: ${tab.title} (${tab.url})`);
-        }
+    chrome.storage.local.get(['bot-token', 'bot-channel', 'bot-username'], function (result) {
+      if (result["bot-token"] && result["bot-username"] && result["bot-channel"]) {
+        twitch_client = twitch.connect_bot(result["bot-username"], result["bot-token"], [result["bot-channel"]]);
+        twitch_client.on('message', onMessageHandler);
       } else {
-        console.log(`* Unknown command ${commandName}`);
+        console.log("Can't connect", result)
+        return null;
       }
-    }
+    });
 
     chrome.tabs.onRemoved.addListener(function (tabId, changeInfo, tab) {
       if (controlled_tab != null && tabId == controlled_tab.id) {
@@ -65,16 +76,6 @@ async function initExtension() {
                 console.log(err);
               });
 
-            client = await chrome.storage.local.get(['bot-token', 'bot-channel', 'bot-username'], function (result) {
-              if (result["bot-token"] && result["bot-username"] && result["bot-channel"]) {
-                client = twitch.connect_bot(result["bot-username"], result["bot-token"], [result["bot-channel"]]);
-                client.on('message', onMessageHandler);
-              } else {
-                console.log("Can't connect", result)
-                return null;
-              }
-            });
-
             break;
           case 'open-settings':
             chrome.tabs.create({ url: 'settings.html' }).then(
@@ -85,8 +86,15 @@ async function initExtension() {
               });
             break;
 
-            sendResponse(null)
-            return true;
+          case 'send-status':
+            console.log("Received send status");
+              sendResponse({
+                "commandList": commands_list,
+                "tab": controlled_tab,
+                "connections": twitch_client,
+              })
+              return true;
+            break;
         }
       }
     );

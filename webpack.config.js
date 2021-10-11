@@ -6,7 +6,7 @@ var webpack = require("webpack"),
   CopyPlugin = require("copy-webpack-plugin"),
   HtmlWebpackPlugin = require("html-webpack-plugin"),
   MiniCssExtractPlugin = require('mini-css-extract-plugin')
-    // WriteFilePlugin = require("write-file-webpack-plugin");
+  // WriteFilePlugin = require("write-file-webpack-plugin");
   ;
 
 var fileExtensions = ["jpg", "jpeg", "png", "gif", "eot", "otf", "svg", "ttf", "woff", "woff2", "css"];
@@ -14,6 +14,7 @@ var fileExtensions = ["jpg", "jpeg", "png", "gif", "eot", "otf", "svg", "ttf", "
 var options = {
   resolve: {
     modules: ['node_modules'],
+    extensions: [".ts", ".js"],
   },
   mode: "development",
   watch: true,
@@ -36,18 +37,18 @@ var options = {
       {
         test: /\.scss$/,
         use: [
-            MiniCssExtractPlugin.loader,
-            {
-              loader: 'css-loader'
-            },
-            {
-              loader: 'sass-loader',
-              options: {
-                sourceMap: true,
-                // options...
-              }
+          MiniCssExtractPlugin.loader,
+          {
+            loader: 'css-loader'
+          },
+          {
+            loader: 'sass-loader',
+            options: {
+              sourceMap: true,
+              // options...
             }
-          ]
+          }
+        ]
       }
     ],
   },
@@ -64,9 +65,9 @@ var options = {
       ],
     }),
     new HtmlWebpackPlugin({
-       template: path.join(__dirname, "src", "html", "popup.html"),
-       filename: "popup.html",
-       chunks: ["popup"]
+      template: path.join(__dirname, "src", "html", "popup.html"),
+      filename: "popup.html",
+      chunks: ["popup"]
     }),
     new HtmlWebpackPlugin({
       template: path.join(__dirname, "src", "html", "settings.html"),

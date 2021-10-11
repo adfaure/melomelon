@@ -1,4 +1,3 @@
-import ("../css/settings.css")
 require('../css/style.scss');
 
 document.addEventListener('DOMContentLoaded', async function (event) {

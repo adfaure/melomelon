@@ -11,7 +11,7 @@ module.exports = {
     };
 
     // Create a client with our options
-    const client = new tmi.client(tmi_opts);
+    client = new tmi.client(tmi_opts);
     client.connect();
 
     return client
