@@ -1,16 +1,22 @@
 import ("../css/settings.css")
-
+require('../css/style.scss');
 
 document.addEventListener('DOMContentLoaded', async function (event) {
 
-  var submit = document.getElementById('submit');
-  var clear = document.getElementById('clear');
+  /* Connections settings */
+  var submit = document.getElementById('submit-connection');
+  var clear = document.getElementById('clear-connection');
 
   var username = document.getElementById('bot-username');
   var token = document.getElementById('bot-token');
   var channel =  document.getElementById('bot-channel');
 
-  await chrome.storage.local.get(['bot-token', 'bot-channel', 'bot-username'], function(result) {
+  /* Command settings */
+  var submitCommands = document.getElementById('submit-commands');
+  var clearCommands = document.getElementById('clear-commands');
+  var commandList = document.getElementById('commands-list');
+
+  await chrome.storage.local.get(['bot-token', 'bot-channel', 'bot-username', 'chat-commands'], function(result) {
     if(result["bot-token"]) {
       token.value = result["bot-token"];
     }
@@ -19,6 +25,9 @@ document.addEventListener('DOMContentLoaded', async function (event) {
     }
     if(result["bot-channel"]) {
       channel.value = result["bot-channel"];
+    }
+    if(result["chat-commands"]) {
+      commandList.value = result["chat-commands"];
     }
   });
 
@@ -36,10 +45,26 @@ document.addEventListener('DOMContentLoaded', async function (event) {
       "bot-username": null,
       "bot-token": null,
       "bot-channel": null
-    }).then(function() {
+    }, function() {
       username.value = null;
       token.value = null;
       channel.value = null;
+    })
+  })
+
+
+  // onClick's logic below:
+  submitCommands.addEventListener('click', function () {
+    chrome.storage.local.set({
+      "chat-commands": commandList.value,
+    })
+  })
+
+  clearCommands.addEventListener('click', function () {
+    chrome.storage.local.set({
+      "chat-commands": null
+    }, function() {
+      commandList.value = null;
     })
   })
 

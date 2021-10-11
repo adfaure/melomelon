@@ -1,11 +1,16 @@
 <!DOCTYPE html>
 <html>
-  <head>
-  </head>
 
-  <body>
-    <h1>Getting started</h1>
-    <h2>Register the bot on twitch</h2>
+<head>
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MeloMelon settings</title>
+</head>
+
+<body>
+  <div class="container">
+  <section class="section">
+    <h1 class="title">Getting started</h1>
+    <h2 class="title">Register the bot on twitch</h2>
     <p>
       First, register the bot using the following <a href="https://twitchapps.com/tmi/" target="_blank">link</a>.
       After this step, you should have an access token for the bot, keep it and don't communicate it to anyone.
@@ -13,27 +18,72 @@
 
       More information about bots <a href="https://dev.twitch.tv/docs/irc">here</a>.
     </p>
+  </section>
 
-    <h2>Configuration of the bot</h2>
+  <section class="section">
+    <h3 class="title">Connection parameters</h3>
 
-    <form action="" method="get" class="form-settings">
-      <div class="form-settings">
-        <label for="bot-username">Bo user's account</label>
-        <input type="text" name="bot-username" id="bot-username" required>
+    <div class="columns">
+      <div class="column is-half">
+        <div class="field">
+          <label for="bot-username" class="label">Bot user account</label>
+          <div class="control">
+            <input class="input" type="text" name="bot-username" id="bot-username" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label" for="bot-token">Connection token (keep it secret!)</label>
+          <div class="control">
+            <input class="input" type="password" name="bot-token" id="bot-token" required>
+          </div>
+        </div>
+
+        <div class="field">
+          <label class="label" for="bot-channel">Channel</label>
+          <div class="control">
+            <input class="input" type="text" name="bot-channel" id="bot-channel" required>
+          </div>
+        </div>
+
+        <div class="field is-grouped">
+          <div class="control">
+            <button class="button is-link" id="submit-connection">Submit</button>
+          </div>
+          <div class="control">
+            <button class="button is-link is-light" id="clear-connection">Clear</button>
+          </div>
+        </div>
       </div>
-      <div class="form-settings">
-        <label for="bot-token">Connection token (keep it secret!)</label>
-        <input type="password" name="bot-token" id="bot-token"required>
+    </div>
+
+    <h3 class="title">Command parameters</h3>
+    <div class="columns">
+      <div class="column is-half">
+
+        <div class="field">
+          <label for="commands-list" class="label">Command list (default to !song)</label>
+          <div class="control">
+            <input class="input" type="text" name="commands-list" id="commands-list" placeholder="!song,!musique" required>
+            <p class="help">Comma separated list of valid commands prefixed by "!". For example !song,!musique,!zic.
+              The extension needs to be reloaded (restart chrome).
+            </p>
+          </div>
+        </div>
+
+        <div class="field is-grouped">
+          <div class="control">
+            <button class="button is-link" id="submit-commands">Submit</button>
+          </div>
+          <div class="control">
+            <button class="button is-link is-light" id="clear-commands">Clear</button>
+          </div>
+        </div>
       </div>
-      <div class="form-settings">
-        <label for="channel">Channel</label>
-        <input type="text" name="bot-channel" id="bot-channel" required>
-      </div>
-      <div class="form-settings">
-        <input type="submit" value="Save settings" id="submit">
-        <input type="submit" value="Clear settings" id="clear">
-      </div>
-    </form>
-  </body>
+    </div>
+  </section>
+</div>
+
+</body>
 
 </html>

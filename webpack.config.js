@@ -4,8 +4,9 @@ var webpack = require("webpack"),
   // env = require("./utils/env"),
   CleanWebpackPlugin = require("clean-webpack-plugin").CleanWebpackPlugin,
   CopyPlugin = require("copy-webpack-plugin"),
-  HtmlWebpackPlugin = require("html-webpack-plugin")
-  // WriteFilePlugin = require("write-file-webpack-plugin");
+  HtmlWebpackPlugin = require("html-webpack-plugin"),
+  MiniCssExtractPlugin = require('mini-css-extract-plugin')
+    // WriteFilePlugin = require("write-file-webpack-plugin");
   ;
 
 var fileExtensions = ["jpg", "jpeg", "png", "gif", "eot", "otf", "svg", "ttf", "woff", "woff2", "css"];
@@ -32,6 +33,22 @@ var options = {
         test: /\.css$/i,
         use: ["style-loader", "css-loader"],
       },
+      {
+        test: /\.scss$/,
+        use: [
+            MiniCssExtractPlugin.loader,
+            {
+              loader: 'css-loader'
+            },
+            {
+              loader: 'sass-loader',
+              options: {
+                sourceMap: true,
+                // options...
+              }
+            }
+          ]
+      }
     ],
   },
   devtool: 'cheap-module-source-map',
@@ -55,7 +72,11 @@ var options = {
       template: path.join(__dirname, "src", "html", "settings.html"),
       filename: "settings.html",
       chunks: ["settings"]
-   }),
+    }),
+    new MiniCssExtractPlugin({
+      filename: 'css/style.css'
+    }),
+
     // new HtmlWebpackPlugin({
     //   template: path.join(__dirname, "src", "options.html"),
     //   filename: "options.html",

@@ -1,4 +1,3 @@
-
 document.addEventListener('DOMContentLoaded', function (event) {
 
   console.log("AddEvents", event);
@@ -9,11 +8,6 @@ document.addEventListener('DOMContentLoaded', function (event) {
     chrome.runtime.sendMessage({type: "open-youtube"});
   })
 
-  var closeButton = document.getElementById('closeTab');
-  // onClick's logic below:
-  closeButton.addEventListener('click', function () {
-    chrome.runtime.sendMessage({type: "close-youtube"});
-  })
 
   var settingsButton = document.getElementById('settingsButton');
   // onClick's logic below:
