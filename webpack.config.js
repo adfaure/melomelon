@@ -15,9 +15,10 @@ var options = {
     modules: ['node_modules'],
   },
   mode: "development",
+  watch: true,
   entry: {
     // popup: path.join(__dirname, "src", "js", "popup.js"),
-    // options: path.join(__dirname, "src", "js", "options.js"),
+    interface: path.join(__dirname, "src", "js", "interface.js"),
     background: path.join(__dirname, "src", "js", "background.js")
   },
   output: {
