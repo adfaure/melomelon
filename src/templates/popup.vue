@@ -1,21 +1,16 @@
 <template>
   <div id="app">
-    <div class="section tile is-ancestor">
-      <div class="tile is-vertical">
-        <div class="tile">
-          <div class="tile is-parent is-vertical">
-            <article class="tile is-child notification is-info">
-              <component-youtube></component-youtube>
-            </article>
-            <article class="tile is-child notification is-info">
-              <component-twitch></component-twitch>
-            </article>
-            <article class="tile is-child">
-                <!-- Add content or other tiles -->
-                <button class="button is-link" v-on:click="openSettingsTab">Open settings</button>
-            </article>
-          </div>
+    <div class="container">
+      <div class="section">
+        <div class="">
+          <component-youtube></component-youtube>
         </div>
+      </div>
+      <div class="section">
+        <component-twitch></component-twitch>
+      </div>
+      <div class="section">
+        <button class="button is-link" v-on:click="openSettingsTab">Open settings</button>
       </div>
     </div>
   </div>

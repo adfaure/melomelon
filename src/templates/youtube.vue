@@ -1,11 +1,14 @@
 <template>
   <div class="content">
-    <p class="title is-4">Youtube</p>
-    <p class="subtitle" v-if="tabId != 0">
+    <p class="title is-3">Youtube</p>
+    <p v-if="tabId != 0" class="subtitle is-5">
       <strong>Playing</strong>: {{ title }}
     </p>
+    <p v-if="tabId != 0">
+      <button class="button is-light is-danger" v-on:click="stopControlledTab">Stop youtube</button>
+    </p>
     <div v-else class="control block">
-      <button class="button" v-on:click="startStopControlledTab">Open youtube</button>
+      <button class="button" v-on:click="startControlledTab">Open youtube</button>
     </div>
   </div>
 </template>
@@ -23,7 +26,7 @@
       var self = this;
       chrome.runtime.sendMessage({ type: "send-status" }, function (result) {
         console.log("status", result);
-        if(result && result["tab"]) {
+        if (result && result["tab"]) {
           chrome.tabs.get(result["tab"], (tab) => {
             self.title = tab.title;
             self.tabId = tab.id;
@@ -37,9 +40,15 @@
 
     },
     methods: {
-      startStopControlledTab: function (event) {
+      startControlledTab: function (event) {
         self = this;
-        chrome.runtime.sendMessage({ type: "open-youtube" }, function(result) {
+        chrome.runtime.sendMessage({ type: "open-youtube" }, function (result) {
+          console.log("getting tab.id", result)
+        });
+      },
+      stopControlledTab: function (event) {
+        self = this;
+        chrome.runtime.sendMessage({ type: "close-youtube" }, function (result) {
           console.log("getting tab.id", result)
         });
       }

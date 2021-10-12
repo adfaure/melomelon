@@ -1,9 +1,9 @@
 <template>
   <div class="content">
-    <p class="title is-4">
+    <p class="title is-3">
       Twitch bot
     </p>
-    <p class="subtitle">
+    <p class="subtitle is-5">
       <strong>status</strong>: {{ status }}
     </p>
     <div v-if="status !== 'online' && status !== 'connecting'">
@@ -22,13 +22,17 @@
       </div>
 
     </div>
-    <p v-else-if="status === 'online'" class="field is-grouped">
-      Connected as {{ username }} on channel {{ channel }}
-    </p>
-    <p v-if="status == 'online' && !youtube_handled" class="notification is-warning block">
-      The bot is connected to twitch, however the youtube tab is not opened yet.
-      Due to some limitations with chrome extensions, the connection will be closed soon unless you open youtube with the extension (by clicking on "open youtube").
-    </p>
+    <div v-else-if="status === 'online'">
+      <ul>
+        <li><strong>Connected as:</strong> {{ username }} on channel {{ channel }}</li>
+        <li><strong>Polled counter: </strong> {{ nb_time_asked }}</li>
+      </ul>
+      <p v-if="status == 'online' && !youtube_handled" class="notification is-warning box">
+        The bot is connected to twitch, however the youtube tab is not opened yet.
+        Due to some limitations with chrome extensions, the connection will be closed soon unless you open youtube with
+        the extension (by clicking on "open youtube").
+      </p>
+    </div>
   </div>
 </template>
 
@@ -41,7 +45,8 @@
         username: '',
         channel: '',
         status: "offline",
-        youtube_handled: false
+        youtube_handled: false,
+        nb_time_asked: 0
       }
     },
     mounted: function () {
@@ -53,6 +58,7 @@
           self.username = result["twitch_client"].username
           self.channel = result["twitch_client"].channels[0]
           self.youtube_handled = result["youtube_handled"]
+          self.nb_time_asked = result["nb_time_asked"]
         }
       });
     },

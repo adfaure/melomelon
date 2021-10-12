@@ -6,6 +6,10 @@ twitch_client = null
 commands_list = ["!song"]
 connected = "offline"
 
+// Bot stats
+nb_time_asked = 0
+history = []
+
 // chrome.runtime.onStartup.addListener(initExtension);
 // chrome.runtime.onInstalled.addListener(initExtension);
 // chrome.runtime.onConnect.addListener(initExtension);
@@ -17,6 +21,12 @@ chrome.tabs.onRemoved.addListener(function (tabId, changeInfo, tab) {
   }
 })
 
+// chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
+//   if(controlled_tab == tabId && changeInfo.status && changeInfo.status === "complete") {
+//     console.log("New song", changeInfo, tabId, tab);
+//     history.append(tab.title)
+//   }
+// });
 
 chrome.runtime.onMessage.addListener(
   // Principal listener used by the popup to control the extension
@@ -51,6 +61,21 @@ chrome.runtime.onMessage.addListener(
 
         return true;
         break;
+        case 'close-youtube':
+          console.log("Closing youtube tab");
+
+          if (controlled_tab != null) {
+            console.log("A tab is already up, removing")
+            chrome.tabs.remove(controlled_tab).then(() => {
+              console.log("tab closed: ");
+              controlled_tab = null;
+              youtube_handled = false;
+              sendResponse({ message: "closed" });
+            })
+          }
+
+          return true;
+          break;
       case 'open-settings':
         chrome.tabs.create({ url: 'settings.html' }).then(
           function (newTab) {
@@ -97,7 +122,8 @@ chrome.runtime.onMessage.addListener(
           tab: controlled_tab,
           connected: connected,
           twitch_client: twitch_client,
-          youtube_handled: youtube_handled
+          youtube_handled: youtube_handled,
+          nb_time_asked: nb_time_asked
         })
         return true;
       case 'keep-alive':
@@ -124,6 +150,7 @@ function onMessageHandler(target, context, msg, self) {
     } else {
       chrome.tabs.get(controlled_tab).then(function (tab) {
         twitch_client.say(target, `${tab.title} (${tab.url})`);
+        nb_time_asked++;
       });
     }
   } else {
@@ -211,9 +238,7 @@ async function keepAlive(tabId) {
       return;
     } catch (e) {
       console.log("chrome.scripting error", e)
-    }
-  }).catch(function (error) {
-    console.log("Tab does not exist anymore", error)
+    }  chrome.tabs.onUpdated.addListener(retryOnTabUpdate);
   });
 
   chrome.tabs.onUpdated.addListener(retryOnTabUpdate);
