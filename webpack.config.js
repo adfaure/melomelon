@@ -5,9 +5,9 @@ var webpack = require("webpack"),
   CleanWebpackPlugin = require("clean-webpack-plugin").CleanWebpackPlugin,
   CopyPlugin = require("copy-webpack-plugin"),
   HtmlWebpackPlugin = require("html-webpack-plugin"),
-  MiniCssExtractPlugin = require('mini-css-extract-plugin')
+  MiniCssExtractPlugin = require('mini-css-extract-plugin'),
   // WriteFilePlugin = require("write-file-webpack-plugin");
-  ;
+ { VueLoaderPlugin } = require('vue-loader');
 
 var fileExtensions = ["jpg", "jpeg", "png", "gif", "eot", "otf", "svg", "ttf", "woff", "woff2", "css"];
 
@@ -15,6 +15,9 @@ var options = {
   resolve: {
     modules: ['node_modules'],
     extensions: [".ts", ".js"],
+    alias: {
+      'vue$': 'vue/dist/vue.esm.js' // 'vue/dist/vue.common.js' for webpack 1
+    }
   },
   mode: "development",
   watch: true,
@@ -49,6 +52,11 @@ var options = {
             }
           }
         ]
+      },
+      // ... other rules
+      {
+        test: /\.vue$/,
+        loader: 'vue-loader'
       }
     ],
   },
@@ -77,6 +85,7 @@ var options = {
     new MiniCssExtractPlugin({
       filename: 'css/style.css'
     }),
+    new VueLoaderPlugin()
 
     // new HtmlWebpackPlugin({
     //   template: path.join(__dirname, "src", "options.html"),
