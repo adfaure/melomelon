@@ -1,51 +1,38 @@
 <template>
   <div id="app">
-    <section class="section">
-      <div class="container">
-        <h2 class="title">Bot state: {{ connected }}</h2>
-      </div>
-    </section>
-    <section class="section">
-      <div class="field is-grouped">
-        <div class="control">
-          <button class="button" v-on:click="startStopControlledTab">Start bot</button>
-        </div>
+    <div class="container">
+      <component-twitch></component-twitch>
+      <component-youtube></component-youtube>
+
+      <section class="section">
         <div class="control">
           <button class="button" v-on:click="openSettingsTab">Open settings</button>
         </div>
-      </div>
-    </section>
+      </section>
+    </div>
   </div>
 </template>
 
 <script>
+  import componentTwitch from '../templates/twitch.vue'
+  import componentYoutube from '../templates/youtube.vue'
+
   export default {
     name: 'app',
+    components: {
+      'component-twitch': componentTwitch,
+      'component-youtube': componentYoutube,
+    },
     data() {
       return {
-        botname: '',
-        connected: false
       }
-    },
-    mounted: function () {
-        var self = this;
-        chrome.runtime.sendMessage({ type: "send-status" }, function(result) {
-          self.connected = result["connected"]
-        });
     },
     methods: {
       openSettingsTab: function (event) {
-        chrome.runtime.sendMessage({ type: "open-settings" }, function(result) {
+        chrome.runtime.sendMessage({ type: "open-settings" }, function (result) {
           console.log("Settings opened")
         });
       },
-      startStopControlledTab: function(event) {
-        self = this;
-        chrome.runtime.sendMessage({ type: "connect-to-chat" }, function(result) {
-          console.log("get result", result)
-          self.msg = result["twitch_client"].username
-        });
-      }
     }
   }
 </script>

@@ -1,7 +1,7 @@
 tmi = require('tmi.js');
 
 module.exports = {
-  connect_bot: function(username, password, channels) {
+  create_client: function(username, password, channels) {
     const tmi_opts = {
       identity: {
         username: username,
@@ -12,8 +12,6 @@ module.exports = {
 
     // Create a client with our options
     client = new tmi.client(tmi_opts);
-    client.connect();
-
     return client
   }
 }
