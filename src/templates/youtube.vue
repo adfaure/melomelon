@@ -1,14 +1,12 @@
 <template>
-  <div id="app">
-    <section class="section">
-      <h3 class="title">Youtube</h3>
-      <div v-if="tab != null">
-        Playing: {{ tab }}
-      </div>
-      <div v-else class="control block">
-        <button class="button" v-on:click="startStopControlledTab">Open youtube</button>
-      </div>
-    </section>
+  <div class="content">
+    <p class="title is-4">Youtube</p>
+    <p class="subtitle" v-if="tabId != 0">
+      <strong>Playing</strong>: {{ title }}
+    </p>
+    <div v-else class="control block">
+      <button class="button" v-on:click="startStopControlledTab">Open youtube</button>
+    </div>
   </div>
 </template>
 
@@ -17,7 +15,8 @@
     name: 'twitch',
     data() {
       return {
-        tab: null
+        tabId: 0,
+        title: ''
       }
     },
     mounted: function () {
@@ -25,8 +24,10 @@
       chrome.runtime.sendMessage({ type: "send-status" }, function (result) {
         console.log("status", result);
         if(result && result["tab"]) {
-          console.log("controlled tab :", result)
-          self.tab = result["tab"]
+          chrome.tabs.get(result["tab"], (tab) => {
+            self.title = tab.title;
+            self.tabId = tab.id;
+          })
         }
       });
 

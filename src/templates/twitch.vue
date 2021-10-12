@@ -1,32 +1,34 @@
 <template>
-  <div id="app">
-    <section class="section">
-        <h3 class="title">Twich status</h3>
-        <div class="">
-          Twitch bot status: {{ status }}
-        </div>
-        <div v-if="status !== 'online' && status !== 'connecting'">
+  <div class="content">
+    <p class="title is-4">
+      Twitch bot
+    </p>
+    <p class="subtitle">
+      <strong>status</strong>: {{ status }}
+    </p>
+    <div v-if="status !== 'online' && status !== 'connecting'">
 
-          <div v-if="status === 'error'" class="block notification is-danger">
-            <div class="block">
-              Could not connect: <strong>{{ error_msg }}</strong>.
-            </div>
-            <div class="block">
-              Open the settings page to update the configuration.
-            </div>
-          </div>
+      <div v-if="status === 'error'" class="block notification is-danger">
+        <p class="block">
+          Could not connect: <strong>{{ error_msg }}</strong>.
+        </p>
+        <p class="block">
+          Open the settings page to update the configuration.
+        </p>
+      </div>
 
-          <div class="control block">
-            <button class="button" v-on:click="startBot">Start bot</button>
-          </div>
+      <div class="control block">
+        <button class="button" v-on:click="startBot">Start bot</button>
+      </div>
 
-        </div>
-        <div v-else-if="status === 'online'" class="field is-grouped">
-          <p>
-            Connected as {{ username }} on channel {{ channel }}
-          </p>
-        </div>
-    </section>
+    </div>
+    <p v-else-if="status === 'online'" class="field is-grouped">
+      Connected as {{ username }} on channel {{ channel }}
+    </p>
+    <p v-if="status == 'online' && !youtube_handled" class="notification is-warning block">
+      The bot is connected to twitch, however the youtube tab is not opened yet.
+      Due to some limitations with chrome extensions, the connection will be closed soon unless you open youtube with the extension (by clicking on "open youtube").
+    </p>
   </div>
 </template>
 
@@ -39,15 +41,18 @@
         username: '',
         channel: '',
         status: "offline",
+        youtube_handled: false
       }
     },
     mounted: function () {
       var self = this;
       chrome.runtime.sendMessage({ type: "send-status" }, function (result) {
         if (result && result["twitch_client"] && result["connected"]) {
+          console.log(result)
           self.status = result["connected"];
           self.username = result["twitch_client"].username
           self.channel = result["twitch_client"].channels[0]
+          self.youtube_handled = result["youtube_handled"]
         }
       });
     },

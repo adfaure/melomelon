@@ -29,7 +29,7 @@ chrome.runtime.onMessage.addListener(
 
         if (controlled_tab != null) {
           console.log("A tab is already up, removing")
-          chrome.tabs.remove(controlled_tab.id).then(() => {
+          chrome.tabs.remove(controlled_tab).then(() => {
             console.log("tab closed: ");
             controlled_tab = null;
           })
