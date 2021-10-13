@@ -1,4 +1,4 @@
-# Getting started
+# ![](./src/images/icon.svg) Getting started
 
 **Melo Melon** a twitch bot inside a chrome extension to send to your chat the current music playing on YouTube.
 
