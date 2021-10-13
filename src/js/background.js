@@ -166,7 +166,7 @@ function updateStats(tab, action) {
 
     if (stats[tab.title] == null) {
       stats[tab.title] = {
-        link: tab.link
+        url: tab.url
       };
       stats[tab.title][action] = 1;
     } else if (stats[tab.title][action] == null) {
