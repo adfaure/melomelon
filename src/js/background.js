@@ -178,9 +178,11 @@ chrome.runtime.onConnect.addListener(port => {
   chrome.storage.local.get(['keepalive-timeout'], function (result) {
 
     var timeout = 295e3; // 5 minutes minus 5 seconds (default value)
-    if(result["keepalive-timeout"]) {
+    if (result["keepalive-timeout"]) {
       timeout = result["keepalive-timeout"] * 1e3
     }
+
+    console.log("keep alive time", timeout);
 
     if (port.name === 'keepAlive') {
       console.log("New port opened", port);
@@ -188,21 +190,21 @@ chrome.runtime.onConnect.addListener(port => {
       lifeline = port;
 
       // Wait information about the current tab
-      port.onMessage.addListener(function (message, port) {
-        setTimeout(function () {
-          if (youtube_handled && controlled_tab == message.tabId) {
-            console.log("set timeout function", message)
-            keepAliveForced(message.tabId)
-          }
-        });
-        // In case the port is disconnected we restart it
-        port.onDisconnect.addListener(function () {
-          if (youtube_handled && controlled_tab == message.tabId) {
-            console.log("disconnected tab", message);
-            keepAliveForced(message.tabId)
-          }
-        });
-      })
+      // port.onMessage.addListener(function (message, port) {
+      setTimeout(function () {
+        if (youtube_handled && controlled_tab == controlled_tab) {
+          console.log("set timeout function", controlled_tab)
+          keepAliveForced(controlled_tab)
+        }
+      }, timeout);
+      // In case the port is disconnected we restart it
+      port.onDisconnect.addListener(function () {
+        if (youtube_handled && controlled_tab == controlled_tab) {
+          console.log("disconnected tab", controlled_tab);
+          keepAliveForced(controlled_tab)
+        }
+      });
+      // })
     }
   });
 });
