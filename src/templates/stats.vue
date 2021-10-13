@@ -7,17 +7,17 @@
           <thead>
             <tr>
               <th><abbr title="Song Title">Song title</abbr></th>
-              <th><abbr title="Number of time asked by chat">Number of time asked</abbr></th>
               <th><abbr title="Number of time the streamer listened to this song">Number of time Played</abbr></th>
+              <th><abbr title="Number of time asked by chat">Number of time asked</abbr></th>
               <th><abbr title="Youtube link">Link</abbr></th>
             </tr>
           </thead>
           <tbody v-for="(nb, song) in stats" :key="song">
             <tr>
               <th>{{ song }}</th>
-              <td>{{ nb["polled"] }}</td>
               <td>{{ nb["playing"] }}</td>
-              <td><a v-bind:href="nb['url']">{{ nb["url"] }}</a></td>
+              <td>{{ nb["polled"] }}</td>
+              <td><a v-bind:href="nb['url']">{{ nb['url'] }}</a></td>
             </tr>
           </tbody>
         </table>

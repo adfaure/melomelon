@@ -45,9 +45,15 @@ chrome.tabs.onRemoved.addListener(function (tabId, changeInfo, tab) {
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
   console.log("HISTORY", changeInfo, tabId, tab.title)
   if (controlled_tab == tabId && changeInfo.title) {
-    console.log("New song", changeInfo, tabId, tab);
-    history.push({ title: tab.title, url: tab.url })
-    updateStats(tab, "playing");
+
+    // We prevent from saving tabs opening the youtube index
+    var matchTitle = tab.title.match(/(^.*?) - YouTube$/);
+
+    if (matchTitle != null) {
+      console.log("New song", changeInfo, tabId, tab);
+      history.push({ title: matchTitle[1], raw_title: tab.title, url: tab.url })
+      updateStats(tab, matchTitle[1], "playing");
+    }
   }
 });
 
@@ -153,7 +159,7 @@ chrome.runtime.onMessage.addListener(
 );
 
 // Update polled stats in local storage
-function updateStats(tab, action) {
+function updateStats(tab, title, action) {
   chrome.storage.local.get(["stats"], (result) => {
     console.log("registered polls", result)
     var stats = {};
@@ -164,15 +170,16 @@ function updateStats(tab, action) {
       stats = result["stats"];
     }
 
-    if (stats[tab.title] == null) {
-      stats[tab.title] = {
-        url: tab.url
+    if (stats[title] == null) {
+      stats[title] = {
+        url: tab.url,
+        raw_title: tab.title,
       };
-      stats[tab.title][action] = 1;
-    } else if (stats[tab.title][action] == null) {
-      stats[tab.title][action] = 1;
+      stats[title][action] = 1;
+    } else if (stats[title][action] == null) {
+      stats[title][action] = 1;
     } else {
-      stats[tab.title][action]++;
+      stats[title][action]++;
     }
 
     console.log(stats)
@@ -194,12 +201,17 @@ function onMessageHandler(target, context, msg, self) {
       console.log("bot not ready")
     } else {
       chrome.tabs.get(controlled_tab).then(function (tab) {
-        twitch_client.say(target, `${tab.title} (${tab.url})`);
 
-        // Update the number of time the bot has been called on this session
-        nb_time_asked++;
-        // Update the local storage stats
-        updateStats(tab, "polled");
+        // This bot supports only youtube videos
+        var match = tab.title.match(/(^.*?) - YouTube$/);
+        if(match != null) {
+          twitch_client.say(target, `${match[1]} (${tab.url})`);
+          // Update the number of time the bot has been called on this session
+          nb_time_asked++;
+          // Update the local storage stats
+          updateStats(tab, match[1], "polled");
+        }
+
 
       });
     }

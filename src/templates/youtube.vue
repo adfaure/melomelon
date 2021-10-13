@@ -25,7 +25,6 @@
     mounted: function () {
       var self = this;
       chrome.runtime.sendMessage({ type: "send-status" }, function (result) {
-        console.log("status", result);
         if (result && result["tab"]) {
           chrome.tabs.get(result["tab"], (tab) => {
             self.title = tab.title;
