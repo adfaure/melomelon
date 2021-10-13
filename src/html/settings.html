@@ -57,7 +57,7 @@
       </div>
     </div>
 
-    <h3 class="title">Command parameters</h3>
+    <h3 class="title">Extension parameters</h3>
     <div class="columns">
       <div class="column is-half">
 
@@ -68,6 +68,15 @@
             <p class="help">Comma separated list of valid commands prefixed by "!". For example !song,!musique,!zic.
               The extension needs to be reloaded (restart chrome).
             </p>
+          </div>
+        </div>
+
+        <div class="field">
+          <label for="keep-alive" class="label">Keep alive timeout in seconds (default to 295s)</label>
+          <div class="control">
+            <input class="input" type="text" name="keep-alive" id="keep-alive" placeholder="300" required>
+            <p class="help">Kee alive connection time</p>
+            <p id="keep-alive-alert" class="box notification is-danger is-hidden">This parameter must be less than or equal to 295.</p>
           </div>
         </div>
 

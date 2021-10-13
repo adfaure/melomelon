@@ -18,6 +18,8 @@ chrome.tabs.onRemoved.addListener(function (tabId, changeInfo, tab) {
   if (controlled_tab != null && tabId == controlled_tab) {
     console.log("self tab closed")
     controlled_tab = null;
+    // Close keep alive lifeline
+    lifeline = null;
   }
 })
 
@@ -61,21 +63,21 @@ chrome.runtime.onMessage.addListener(
 
         return true;
         break;
-        case 'close-youtube':
-          console.log("Closing youtube tab");
+      case 'close-youtube':
+        console.log("Closing youtube tab");
 
-          if (controlled_tab != null) {
-            console.log("A tab is already up, removing")
-            chrome.tabs.remove(controlled_tab).then(() => {
-              console.log("tab closed: ");
-              controlled_tab = null;
-              youtube_handled = false;
-              sendResponse({ message: "closed" });
-            })
-          }
+        if (controlled_tab != null) {
+          console.log("A tab is already up, removing")
+          chrome.tabs.remove(controlled_tab).then(() => {
+            console.log("tab closed: ");
+            controlled_tab = null;
+            youtube_handled = false;
+            sendResponse({ message: "closed" });
+          })
+        }
 
-          return true;
-          break;
+        return true;
+        break;
       case 'open-settings':
         chrome.tabs.create({ url: 'settings.html' }).then(
           function (newTab) {
@@ -173,29 +175,36 @@ chrome.tabs.onRemoved.addListener(function (tabId, changeInfo, tab) {
 
 // The listening port
 chrome.runtime.onConnect.addListener(port => {
-  if (port.name === 'keepAlive') {
-    console.log("New port opened", port);
-    // save the lifeline
-    lifeline = port;
+  chrome.storage.local.get(['keepalive-timeout'], function (result) {
 
-    // Wait information about the current tab
-    port.onMessage.addListener(function (message, port) {
-      setTimeout(function () {
-        if (youtube_handled && controlled_tab == message.tabId) {
-          console.log("set timeout function", message)
-          keepAliveForced(message.tabId)
-        }
-      }, 6e4);
-      // In case the port is disconnected we restart it
-      port.onDisconnect.addListener(function () {
-        if (youtube_handled && controlled_tab == message.tabId) {
-          console.log("disconnected tab", message);
-          keepAliveForced(message.tabId)
-        }
-      });
-    })
+    var timeout = 295e3; // 5 minutes minus 5 seconds (default value)
+    if(result["keepalive-timeout"]) {
+      timeout = result["keepalive-timeout"] * 1e3
+    }
 
-  }
+    if (port.name === 'keepAlive') {
+      console.log("New port opened", port);
+      // save the lifeline
+      lifeline = port;
+
+      // Wait information about the current tab
+      port.onMessage.addListener(function (message, port) {
+        setTimeout(function () {
+          if (youtube_handled && controlled_tab == message.tabId) {
+            console.log("set timeout function", message)
+            keepAliveForced(message.tabId)
+          }
+        });
+        // In case the port is disconnected we restart it
+        port.onDisconnect.addListener(function () {
+          if (youtube_handled && controlled_tab == message.tabId) {
+            console.log("disconnected tab", message);
+            keepAliveForced(message.tabId)
+          }
+        });
+      })
+    }
+  });
 });
 
 function keepAliveForced(tabId) {
@@ -238,7 +247,7 @@ async function keepAlive(tabId) {
       return;
     } catch (e) {
       console.log("chrome.scripting error", e)
-    }  chrome.tabs.onUpdated.addListener(retryOnTabUpdate);
+    } chrome.tabs.onUpdated.addListener(retryOnTabUpdate);
   });
 
   chrome.tabs.onUpdated.addListener(retryOnTabUpdate);
