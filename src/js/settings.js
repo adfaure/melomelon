@@ -1,5 +1,10 @@
 require('../css/style.scss');
 
+/*
+  TODO: Rewrite it in vue
+  Setting page, it store user settings into the local storage.
+*/
+
 document.addEventListener('DOMContentLoaded', async function (event) {
 
   /* Connections settings */

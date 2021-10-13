@@ -1,3 +1,6 @@
+<!--
+  Stats page. Displays information about the song played and polled by viewers.
+-->
 <template>
   <div id="app">
     <div class="container">

@@ -1,3 +1,7 @@
+<!--
+  YouTube component.
+  User interface to connect and display information about the controlled YouTube tab.
+-->
 <template>
   <div class="content">
     <p class="title is-3">Youtube</p>
@@ -47,7 +51,6 @@
     },
     methods: {
       gotToControlledTab: function (event) {
-        console.log("GOTO TOAB")
         chrome.tabs.update(this.tabId, { selected: true });
       },
       startControlledTab: function (event) {

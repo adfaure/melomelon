@@ -1,3 +1,7 @@
+<!--
+  Popup main template.
+  It is the main extension interface to connect to twitch and to start youtube.
+-->
 <template>
   <div id="app">
     <div class="container">

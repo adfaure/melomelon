@@ -1,5 +1,6 @@
 tmi = require('tmi.js');
 
+// Simple helper module to create the twitch client.
 module.exports = {
   create_client: function(username, password, channels) {
     const tmi_opts = {

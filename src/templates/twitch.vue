@@ -1,3 +1,8 @@
+<!--
+  Twitch component.
+  User interface to connect and display information about the twitch bot.
+  It communicates with the service background using message.
+-->
 <template>
   <div class="content">
     <p class="title is-3">

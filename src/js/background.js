@@ -1,5 +1,18 @@
+/*
+  Main script of the extension.
+
+  It is a stateful service that maintains a two states:
+  - A connection to twitch to respond to chat commands;
+  - A chrome tab that will be tracked, to send information to the twitch chat.
+
+  Due to some chrome extension limitations, the end of the script is dedicated to a hack
+  that is able to maintain this service alive when the YouTube tab is opened.
+
+  The script doesn't track or get information from any other tabs.
+*/
 const twitch = require('./twitch.js');
 
+// Global variables, this is the state of the service
 controlled_tab = null
 youtube_handled = false
 twitch_client = null
@@ -11,6 +24,7 @@ nb_time_asked = 0
 history = []
 start_time = new Date().getTime()
 
+// Return the current state
 function getState() {
   var current_time = new Date().getTime();
 
@@ -29,10 +43,8 @@ function getState() {
   };
 }
 
-// chrome.runtime.onStartup.addListener(initExtension);
-// chrome.runtime.onInstalled.addListener(initExtension);
-// chrome.runtime.onConnect.addListener(initExtension);
-
+// Listen to removed tabs, to detect if the user close the
+// tab listen in this script.
 chrome.tabs.onRemoved.addListener(function (tabId, changeInfo, tab) {
   if (controlled_tab != null && tabId == controlled_tab) {
     console.log("self tab closed")
@@ -42,6 +54,7 @@ chrome.tabs.onRemoved.addListener(function (tabId, changeInfo, tab) {
   }
 })
 
+// Listen to tabs event, to log the song history
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
   console.log("HISTORY", changeInfo, tabId, tab.title)
   if (controlled_tab == tabId && changeInfo.title) {
@@ -57,7 +70,11 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
   }
 });
 
+// Main way to access to this script from other place of the extension.
+// The other components of the extension (the popup, states etc)
+// can access to the this service using message passing.
 chrome.runtime.onMessage.addListener(
+
   // Principal listener used by the popup to control the extension
   function (request, sender, sendResponse) {
 
@@ -93,6 +110,7 @@ chrome.runtime.onMessage.addListener(
 
         return true;
         break;
+
       case 'close-youtube':
         console.log("Closing youtube tab");
 
@@ -111,6 +129,8 @@ chrome.runtime.onMessage.addListener(
 
         return true;
         break;
+
+      // Connect the twitch bot to twitch chat
       case 'connect-to-chat':
         if (twitch_client != null && connected === "online") {
           console.log("already connected");
@@ -145,25 +165,20 @@ chrome.runtime.onMessage.addListener(
         }
         return true;
         break;
+
+      // Send the current state
       case 'send-status':
         console.log("Received send status");
         sendResponse(getState())
         return true;
-      case 'keep-alive':
-        console.log("hello from content-script")
-        sendResponse({})
-        break;
     }
-
   }
 );
 
-// Update polled stats in local storage
+// Update polled and history stats in local storage
 function updateStats(tab, title, action) {
   chrome.storage.local.get(["stats"], (result) => {
-    console.log("registered polls", result)
     var stats = {};
-
     if (result["stats"] == null) {
       stats = {};
     } else {
@@ -182,12 +197,13 @@ function updateStats(tab, title, action) {
       stats[title][action]++;
     }
 
-    console.log(stats)
     chrome.storage.local.set({ "stats": stats })
   })
 }
 
-// Called every time a message comes in
+// Called every time a chat message comes in
+// This is the twitch part, it processes chat messages and respond to
+// the commands configured.
 function onMessageHandler(target, context, msg, self) {
   if (self) { return; } // Ignore messages from the bot
   console.log(target, context, msg, self);
@@ -204,14 +220,13 @@ function onMessageHandler(target, context, msg, self) {
 
         // This bot supports only youtube videos
         var match = tab.title.match(/(^.*?) - YouTube$/);
-        if(match != null) {
+        if (match != null) {
           twitch_client.say(target, `${match[1]} (${tab.url})`);
           // Update the number of time the bot has been called on this session
           nb_time_asked++;
           // Update the local storage stats
           updateStats(tab, match[1], "polled");
         }
-
 
       });
     }
@@ -220,9 +235,18 @@ function onMessageHandler(target, context, msg, self) {
   }
 }
 
-/* https://stackoverflow.com/questions/66618136/persistent-service-worker-in-chrome-extension */
-let lifeline;
+/*
+  https://stackoverflow.com/questions/66618136/persistent-service-worker-in-chrome-extension
+  This part is dedicated to maintain this script running when youtube is active.
 
+  Service worker are not meant to be long live services that run forever.
+  To overcome this limitation, we periodically open a communication port that will remain
+  active for 5 minutes (the lifespan of the service). Each time a new port is active, it
+  will keep the service running for 5 more minutes.
+
+  The port is opened from the managed YouTube tab.
+*/
+let lifeline;
 
 chrome.tabs.onRemoved.addListener(function (tabId, changeInfo, tab) {
   if (controlled_tab != null && tabId == controlled_tab) {
@@ -242,15 +266,11 @@ chrome.runtime.onConnect.addListener(port => {
       timeout = result["keepalive-timeout"] * 1e3
     }
 
-    console.log("keep alive time", timeout);
-
     if (port.name === 'keepAlive') {
       console.log("New port opened", port);
       // save the lifeline
       lifeline = port;
 
-      // Wait information about the current tab
-      // port.onMessage.addListener(function (message, port) {
       setTimeout(function () {
         if (youtube_handled && controlled_tab == controlled_tab) {
           console.log("set timeout function", controlled_tab)
@@ -264,7 +284,6 @@ chrome.runtime.onConnect.addListener(port => {
           keepAliveForced(controlled_tab)
         }
       });
-      // })
     }
   });
 });
@@ -278,13 +297,9 @@ function keepAliveForced(tabId) {
 }
 
 async function keepAlive(tabId) {
-  console.log("Calling keep alive", lifeline, tabId)
   if (lifeline) {
-    console.log("Already alive, returning")
     return
   };
-
-  console.log("lifeline null, continuing")
 
   // Retrieve the tab
   chrome.tabs.get(tabId).then(async function (tab) {
@@ -308,6 +323,9 @@ async function keepAlive(tabId) {
       chrome.tabs.onUpdated.removeListener(retryOnTabUpdate);
       return;
     } catch (e) {
+      // This should append as when a new tab is opened or updated, the url might not
+      // be available. In that case, the script fail with permission error.
+      // We re-add the listener and wait for the url to be updated.
       console.log("chrome.scripting error", e)
     } chrome.tabs.onUpdated.addListener(retryOnTabUpdate);
   });
@@ -316,8 +334,6 @@ async function keepAlive(tabId) {
 }
 
 async function retryOnTabUpdate(tabId, info, tab) {
-  console.log("Tab updated, retry: ", tabId, info, tab, "controlled_tab:", controlled_tab);
-
   if (youtube_handled && info.url && /^(file|https?):/.test(info.url) && controlled_tab == tabId) {
     console.log("Retried, now calling keep alive!", tabId);
     keepAlive(tabId);
