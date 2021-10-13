@@ -76,6 +76,7 @@
             var state = result["state"]
             self.username = state["twitch_client"].username
             self.channel = state["twitch_client"].channels[0]
+            self.youtube_handled = state["youtube_handled"]
             self.status = "online";
           }
         });

@@ -51,7 +51,7 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
 
     if (matchTitle != null) {
       console.log("New song", changeInfo, tabId, tab);
-      history.push({ title: matchTitle[1], raw_title: tab.title, url: tab.url })
+      history.unshift({ title: matchTitle[1], raw_title: tab.title, url: tab.url })
       updateStats(tab, matchTitle[1], "playing");
     }
   }

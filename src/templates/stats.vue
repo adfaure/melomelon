@@ -1,6 +1,22 @@
 <template>
   <div id="app">
     <div class="container">
+      <div class="section">
+        <div class="field is-grouped">
+          <p class="control">
+            <button class="button is-link" v-on:click="refreshPage">Refresh the page</button>
+          </p>
+        </div>
+      </div>
+      <section class="section content">
+        <p class="title is-1"> Song history </p>
+        <p class="subtitle is-3"> History of the current session </p>
+        <ul>
+          <li v-for="song in song_history">
+            {{ song.title }} (<a v-bind:href="song.url">link</a>)
+          </li>
+        </ul>
+      </section>
       <section class="section content">
         <p class="title is-1"> Song stats </p>
         <table class="table">
@@ -27,22 +43,6 @@
           </p>
         </div>
       </section>
-      <section class="section content">
-        <p class="title is-1"> Song history </p>
-        <p class="subtitle is-3"> History of the current session </p>
-        <ul>
-          <li v-for="song in song_history">
-            {{ song.title }} (<a v-bind:href="song.url">link</a>)
-          </li>
-        </ul>
-      </section>
-      <div class="section">
-        <div class="field is-grouped">
-          <p class="control">
-            <button class="button is-link" v-on:click="refreshPage">Refresh the page</button>
-          </p>
-        </div>
-      </div>
     </div>
   </div>
 </template>
