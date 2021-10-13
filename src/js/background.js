@@ -9,6 +9,25 @@ connected = "offline"
 // Bot stats
 nb_time_asked = 0
 history = []
+start_time = new Date().getTime()
+
+function getState() {
+  var current_time = new Date().getTime();
+
+  return {
+    commandList: commands_list,
+    tab: controlled_tab,
+    connected: connected,
+    twitch_client: twitch_client,
+    youtube_handled: youtube_handled,
+
+    // Stats
+    start_time: start_time,
+    uptime: current_time - start_time,
+    nb_time_asked: nb_time_asked,
+    history: history
+  };
+}
 
 // chrome.runtime.onStartup.addListener(initExtension);
 // chrome.runtime.onInstalled.addListener(initExtension);
@@ -23,12 +42,14 @@ chrome.tabs.onRemoved.addListener(function (tabId, changeInfo, tab) {
   }
 })
 
-// chrome.tabs.onUpdated.addListener(function(tabId, changeInfo, tab) {
-//   if(controlled_tab == tabId && changeInfo.status && changeInfo.status === "complete") {
-//     console.log("New song", changeInfo, tabId, tab);
-//     history.append(tab.title)
-//   }
-// });
+chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
+  console.log("HISTORY", changeInfo, tabId, tab.title)
+  if (controlled_tab == tabId && changeInfo.title) {
+    console.log("New song", changeInfo, tabId, tab);
+    history.push({ title: tab.title, url: tab.url })
+    updateStats(tab, "playing");
+  }
+});
 
 chrome.runtime.onMessage.addListener(
   // Principal listener used by the popup to control the extension
@@ -52,7 +73,10 @@ chrome.runtime.onMessage.addListener(
             controlled_tab = newTab.id;
             youtube_handled = true;
 
-            sendResponse({ tab: newTab });
+            sendResponse({
+              error: null,
+              state: getState()
+            });
 
             keepAlive(newTab.id);
 
@@ -72,27 +96,22 @@ chrome.runtime.onMessage.addListener(
             console.log("tab closed: ");
             controlled_tab = null;
             youtube_handled = false;
-            sendResponse({ message: "closed" });
+            sendResponse({
+              error: null,
+              state: getState()
+            });
           })
         }
 
         return true;
         break;
-      case 'open-settings':
-        chrome.tabs.create({ url: 'settings.html' }).then(
-          function (newTab) {
-            console.log(newTab);
-            sendResponse({});
-          }).catch(function (err) {
-            console.log(err);
-            sendResponse({});
-          });
-        return true;
-        break;
       case 'connect-to-chat':
         if (twitch_client != null && connected === "online") {
           console.log("already connected");
-          sendResponse({ "twitch_client": twitch_client })
+          sendResponse({
+            error: null,
+            state: getState()
+          })
         } else {
           chrome.storage.local.get(['bot-token', 'bot-channel', 'bot-username'], function (result) {
             if (result["bot-token"] && result["bot-username"] && result["bot-channel"]) {
@@ -102,16 +121,19 @@ chrome.runtime.onMessage.addListener(
               twitch_client.on('message', onMessageHandler);
               connected = "connecting"
               twitch_client.connect().then(function (addr, port) {
-                sendResponse({ twitch_client: twitch_client });
+                sendResponse({
+                  error: null,
+                  state: getState()
+                });
                 connected = "online";
               }).catch(function (error) {
                 console.log("Can't connect to twitch", error)
-                sendResponse({ twitch_client: null, error: error })
+                sendResponse({ state: null, error: error })
                 connected = "error";
               })
             } else {
               connected = "offline";
-              sendResponse({ "twitch_client": null, "error": "Missing connection information" });
+              sendResponse({ state: null, "error": "Missing connection information" });
             }
           });
         }
@@ -119,14 +141,7 @@ chrome.runtime.onMessage.addListener(
         break;
       case 'send-status':
         console.log("Received send status");
-        sendResponse({
-          commandList: commands_list,
-          tab: controlled_tab,
-          connected: connected,
-          twitch_client: twitch_client,
-          youtube_handled: youtube_handled,
-          nb_time_asked: nb_time_asked
-        })
+        sendResponse(getState())
         return true;
       case 'keep-alive':
         console.log("hello from content-script")
@@ -136,6 +151,33 @@ chrome.runtime.onMessage.addListener(
 
   }
 );
+
+
+// Update polled stats in local storage
+function updateStats(tab, action) {
+  chrome.storage.local.get(["stats"], (result) => {
+    console.log("registered polls", result)
+    var stats = {};
+
+    if (result["stats"] == null) {
+      stats = {};
+    } else {
+      stats = result["stats"];
+    }
+
+    if (stats[tab.title] == null) {
+      stats[tab.title] = {};
+      stats[tab.title][action] = 1;
+    } else if (stats[tab.title][action] == null) {
+      stats[tab.title][action] = 1;
+    } else {
+      stats[tab.title][action]++;
+    }
+
+    console.log(stats)
+    chrome.storage.local.set({ "stats": stats })
+  })
+}
 
 // Called every time a message comes in
 function onMessageHandler(target, context, msg, self) {
@@ -152,7 +194,12 @@ function onMessageHandler(target, context, msg, self) {
     } else {
       chrome.tabs.get(controlled_tab).then(function (tab) {
         twitch_client.say(target, `${tab.title} (${tab.url})`);
+
+        // Update the number of time the bot has been called on this session
         nb_time_asked++;
+        // Update the local storage stats
+        updateStats(tab, "polled");
+
       });
     }
   } else {

@@ -43,13 +43,23 @@
       startControlledTab: function (event) {
         self = this;
         chrome.runtime.sendMessage({ type: "open-youtube" }, function (result) {
-          console.log("getting tab.id", result)
+          if (result && result["error"]) {
+            console.log(result["error"]);
+            throw result["error"];
+          } else if (result && result["state"] && result["state"]["tab"]) {
+            state = result["state"]
+            chrome.tabs.get(sate["tab"], (tab) => {
+              self.title = tab.title;
+              self.tabId = tab.id;
+            })
+          }
         });
       },
       stopControlledTab: function (event) {
         self = this;
         chrome.runtime.sendMessage({ type: "close-youtube" }, function (result) {
-          console.log("getting tab.id", result)
+          self.title = "";
+          self.tabId = 0;
         });
       }
     }

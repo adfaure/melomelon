@@ -8,93 +8,97 @@
 
 <body>
   <div class="container">
-  <section class="section">
-    <h1 class="title">Getting started</h1>
-    <h2 class="title">Register the bot on twitch</h2>
-    <p>
-      First, register the bot using the following <a href="https://twitchapps.com/tmi/" target="_blank">link</a>.
-      After this step, you should have an access token for the bot, keep it and don't communicate it to anyone.
-      It will be used, to connect the bot to twitch.
+    <section class="section">
+      <h1 class="title is-1">Getting started</h1>
+      <h3 class="title is-3">Register the bot on twitch</h3>
+      <p class="content">
+        First, register the bot using the following <a href="https://twitchapps.com/tmi/" target="_blank">link</a>.
+        After this step, you should have an access token for the bot, keep it and don't communicate it to anyone.
+        It will be used, to connect the bot to twitch.
 
-      More information about bots <a href="https://dev.twitch.tv/docs/irc">here</a>.
-    </p>
-  </section>
+        More information about bots <a href="https://dev.twitch.tv/docs/irc">here</a>.
+      </p>
+    </section>
 
-  <section class="section">
-    <h3 class="title">Connection parameters</h3>
+    <section class="section">
+      <h3 class="title is-3">Connection parameters</h3>
 
-    <div class="columns">
-      <div class="column is-half">
-        <div class="field">
-          <label for="bot-username" class="label">Bot user account</label>
-          <div class="control">
-            <input class="input" type="text" name="bot-username" id="bot-username" required>
+      <div class="columns">
+        <div class="column is-half">
+          <div class="field">
+            <label for="bot-username" class="label">Bot user account</label>
+            <div class="control">
+              <input class="input" type="text" name="bot-username" id="bot-username" required>
+            </div>
           </div>
-        </div>
 
-        <div class="field">
-          <label class="label" for="bot-token">Connection token (keep it secret!)</label>
-          <div class="control">
-            <input class="input" type="password" name="bot-token" id="bot-token" required>
+          <div class="field">
+            <label class="label" for="bot-token">Connection token (keep it secret!)</label>
+            <div class="control">
+              <input class="input" type="password" name="bot-token" id="bot-token" required>
+            </div>
           </div>
-        </div>
 
-        <div class="field">
-          <label class="label" for="bot-channel">Channel</label>
-          <div class="control">
-            <input class="input" type="text" name="bot-channel" id="bot-channel" required>
+          <div class="field">
+            <label class="label" for="bot-channel">Channel</label>
+            <div class="control">
+              <input class="input" type="text" name="bot-channel" id="bot-channel" required>
+            </div>
           </div>
-        </div>
 
-        <div class="field is-grouped">
-          <div class="control">
-            <button class="button is-link" id="submit-connection">Save</button>
-          </div>
-          <div class="control">
-            <button class="button is-link is-light" id="clear-connection">Clear</button>
-          </div>
-        </div>
-      </div>
-    </div>
-
-    <h3 class="title">Extension parameters</h3>
-    <div class="columns">
-      <div class="column is-half">
-
-        <div class="field">
-          <label for="commands-list" class="label">Command list (default to !song)</label>
-          <div class="control">
-            <input class="input" type="text" name="commands-list" id="commands-list" placeholder="!song,!musique" required>
-            <p class="help">Comma separated list of valid commands prefixed by "!". For example !song,!musique,!zic.
-              The extension needs to be reloaded (restart chrome).
-            </p>
-          </div>
-        </div>
-
-        <div class="field">
-          <label for="keep-alive" class="label">Keep alive timeout in seconds (default to 295s)</label>
-          <div class="control">
-            <input class="input" type="text" name="keep-alive" id="keep-alive" placeholder="300" required>
-            <p class="help">
-              Don't touch this parameters unless the bot is being disconnected during youtube playing.
-              You can try to lower this number to maintain the connection active, note that it could also affect performances.
-            </p>
-            <p id="keep-alive-alert" class="box notification is-danger is-hidden">This parameter must be less than or equal to 295.</p>
-          </div>
-        </div>
-
-        <div class="field is-grouped">
-          <div class="control">
-            <button class="button is-link" id="submit-commands">Save</button>
-          </div>
-          <div class="control">
-            <button class="button is-link is-light" id="clear-commands">Clear</button>
+          <div class="field is-grouped">
+            <div class="control">
+              <button class="button is-link" id="submit-connection">Save</button>
+            </div>
+            <div class="control">
+              <button class="button is-link is-light" id="clear-connection">Clear</button>
+            </div>
           </div>
         </div>
       </div>
-    </div>
-  </section>
-</div>
+    </section>
+    <section class="section">
+      <h3 class="title is-3">Extension parameters</h3>
+      <div class="columns">
+        <div class="column is-half">
+
+          <div class="field">
+            <label for="commands-list" class="label">Command list (default to !song)</label>
+            <div class="control">
+              <input class="input" type="text" name="commands-list" id="commands-list" placeholder="!song,!musique"
+                required>
+              <p class="help">Comma separated list of valid commands prefixed by "!". For example !song,!musique,!zic.
+                The extension needs to be reloaded (restart chrome).
+              </p>
+            </div>
+          </div>
+
+          <div class="field">
+            <label for="keep-alive" class="label">Keep alive timeout in seconds (default to 295s)</label>
+            <div class="control">
+              <input class="input" type="text" name="keep-alive" id="keep-alive" placeholder="300" required>
+              <p class="help">
+                Don't touch this parameters unless the bot is being disconnected during youtube playing.
+                You can try to lower this number to maintain the connection active, note that it could also affect
+                performances.
+              </p>
+              <p id="keep-alive-alert" class="box notification is-danger is-hidden">This parameter must be less than or
+                equal to 295.</p>
+            </div>
+          </div>
+
+          <div class="field is-grouped">
+            <div class="control">
+              <button class="button is-link" id="submit-commands">Save</button>
+            </div>
+            <div class="control">
+              <button class="button is-link is-light" id="clear-commands">Clear</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  </div>
 
 </body>
 

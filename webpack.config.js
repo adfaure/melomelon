@@ -25,7 +25,8 @@ var options = {
     // popup: path.join(__dirname, "src", "js", "popup.js"),
     popup: path.join(__dirname, "src", "js", "popup.js"),
     settings: path.join(__dirname, "src", "js", "settings.js"),
-    background: path.join(__dirname, "src", "js", "background.js")
+    background: path.join(__dirname, "src", "js", "background.js"),
+    stats: path.join(__dirname, "src", "js", "stats.js")
 
   },
   output: {
@@ -82,6 +83,11 @@ var options = {
       template: path.join(__dirname, "src", "html", "settings.html"),
       filename: "settings.html",
       chunks: ["settings"]
+    }),
+    new HtmlWebpackPlugin({
+      template: path.join(__dirname, "src", "html", "stats.html"),
+      filename: "stats.html",
+      chunks: ["stats"]
     }),
     new MiniCssExtractPlugin({
       filename: 'css/style.css'

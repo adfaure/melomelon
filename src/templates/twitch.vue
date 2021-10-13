@@ -68,15 +68,15 @@
         self.status = "connecting";
 
         chrome.runtime.sendMessage({ type: "connect-to-chat" }, function (result) {
-          console.log("get result", result)
-          if (result["twitch_client"]) {
-            self.username = result["twitch_client"].username
-            self.channel = result["twitch_client"].channels[0]
-            self.status = "online";
-          } else {
+          if (result["error"] != null) {
             console.log("connection error", result)
             self.error_msg = result.error;
             self.status = "error";
+          } else if (result["state"] && result["state"]["twitch_client"]) {
+            var state = result["state"]
+            self.username = state["twitch_client"].username
+            self.channel = state["twitch_client"].channels[0]
+            self.status = "online";
           }
         });
       }
