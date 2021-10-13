@@ -3,7 +3,6 @@
     <div class="container">
       <section class="section content">
         <p class="title is-1"> Song stats </p>
-
         <table class="table">
           <thead>
             <tr>
@@ -20,21 +19,53 @@
             </tr>
           </tbody>
         </table>
+        <div class="field is-grouped">
+          <p class="control">
+            <button class="button is-small is-danger" v-on:click="clearStats">Clear</button>
+          </p>
+        </div>
       </section>
       <section class="section content">
         <p class="title is-1"> Song history </p>
         <p class="subtitle is-3"> History of the current session </p>
         <ul>
-          <li v-for="song in song_history" :key="song.title">
+          <li v-for="song in song_history">
             {{ song.title }} (<a v-bind:href="song.url">link</a>)
           </li>
         </ul>
       </section>
+      <div class="section">
+        <div class="field is-grouped">
+          <p class="control">
+            <button class="button is-link" v-on:click="refreshPage">Refresh the page</button>
+          </p>
+        </div>
+      </div>
     </div>
   </div>
 </template>
 
 <script>
+
+  // Needs to be bounded
+  function refreshPage() {
+    console.log("refreshing", this)
+    var self = this;
+    chrome.runtime.sendMessage({ type: "send-status" }, function (result) {
+      console.log(result)
+      self.song_history = result["history"];
+    });
+
+    chrome.storage.local.get(["stats"], (result) => {
+      console.log("polls", result)
+      if (result["stats"]) {
+        self.stats = result["stats"];
+      } else {
+        self.stats = {};
+      }
+    })
+  };
+
   export default {
     name: 'app',
     data() {
@@ -44,18 +75,13 @@
       }
     },
     mounted: function () {
-      var self = this;
-      chrome.runtime.sendMessage({ type: "send-status" }, function (result) {
-        console.log(result)
-        self.song_history = result["history"];
-      });
-
-      chrome.storage.local.get(["stats"], (result) => {
-        console.log("polls", result)
-        if (result["stats"]) {
-          self.stats = result["stats"];
-        }
-      })
-    }
+      refreshPage.bind(this)();
+    },
+    methods: {
+      refreshPage: function () { refreshPage.bind(this)(); },
+      clearStats: function () {
+        chrome.storage.local.set({ stats: null }, refreshPage.bind(this))
+      }
+    },
   }
 </script>

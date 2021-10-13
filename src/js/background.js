@@ -152,7 +152,6 @@ chrome.runtime.onMessage.addListener(
   }
 );
 
-
 // Update polled stats in local storage
 function updateStats(tab, action) {
   chrome.storage.local.get(["stats"], (result) => {
@@ -166,7 +165,9 @@ function updateStats(tab, action) {
     }
 
     if (stats[tab.title] == null) {
-      stats[tab.title] = {};
+      stats[tab.title] = {
+        link: tab.link
+      };
       stats[tab.title][action] = 1;
     } else if (stats[tab.title][action] == null) {
       stats[tab.title][action] = 1;
@@ -277,7 +278,7 @@ async function keepAlive(tabId) {
   chrome.tabs.get(tabId).then(async function (tab) {
     try {
       if (tab.id != controlled_tab) {
-        throw "Attatched keepalive on wrong tab current:" + tabId + ", controlled:" + controlled_tab
+        throw "Attached keepalive on wrong tab current:" + tabId + ", controlled:" + controlled_tab
       }
       await chrome.scripting.executeScript({
         target: { tabId: tab.id },
