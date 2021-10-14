@@ -60,8 +60,8 @@
             console.log(result["error"]);
             throw result["error"];
           } else if (result && result["state"] && result["state"]["tab"]) {
-            state = result["state"]
-            chrome.tabs.get(sate["tab"], (tab) => {
+            var state = result["state"]
+            chrome.tabs.get(state["tab"], (tab) => {
               self.title = tab.title;
               self.tabId = tab.id;
             })

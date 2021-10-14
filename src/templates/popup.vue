@@ -57,20 +57,16 @@
         chrome.tabs.create({ url: 'stats.html' }).then(
           function (newTab) {
             console.log(newTab);
-            sendResponse({});
           }).catch(function (err) {
             console.log(err);
-            sendResponse({});
           });
       },
       openSettingsTab: function (event) {
         chrome.tabs.create({ url: 'settings.html' }).then(
           function (newTab) {
             console.log(newTab);
-            sendResponse({});
           }).catch(function (err) {
             console.log(err);
-            sendResponse({});
           });
       },
     }
