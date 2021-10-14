@@ -1,0 +1,15 @@
+image: nixos/nix:latest
+
+stages:
+  - build
+
+build_and_test:
+  stage: build
+  script:
+    # Build the extension
+    - nix-build default.nix -A melomelon
+  artifacts:
+    when: always
+    expire_in: 8 hours
+    paths:
+      - /build
