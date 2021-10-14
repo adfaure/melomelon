@@ -1,9 +1,6 @@
 [Unreleased]
 ============
 
-[1.0.0]
-=======
-
 - Release date: 2021-14-10
 
 Added
