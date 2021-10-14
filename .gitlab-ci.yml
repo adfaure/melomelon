@@ -2,6 +2,7 @@ image: nixos/nix:latest
 
 stages:
   - build
+  - release
 
 build_and_test:
   stage: build
