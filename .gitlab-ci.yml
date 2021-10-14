@@ -2,7 +2,7 @@ image: nixos/nix:latest
 
 stages:
   - build
-  - prepare
+  - prepare_release
   - release
 
 build_and_test:
@@ -13,6 +13,8 @@ build_and_test:
     - mkdir melomelon-chrome-extension
     # Copy the result out of the nix store
     - cp -r result/* melomelon-chrome-extension
+    # Better permissions
+    - chmod -R ugo=rwX melomelon-chrome-extension
 
   artifacts:
     when: always
@@ -20,24 +22,35 @@ build_and_test:
     paths:
       - melomelon-chrome-extension
 
-
-release_job:
-  stage: release
-  image: registry.gitlab.com/gitlab-org/release-cli:latest
+# https://stackoverflow.com/a/67583488/3849997
+prepare:release:
+  stage: prepare_release
+  rules:
+    - if: $CI_COMMIT_TAG
   needs:
     - job: build_and_test
       artifacts: true
+  before_script:
+    - echo "Setting up packages for Build"
+    - apk --no-cache add zip
+  script:
+    - echo "Zip file"
+    - zip -r release-${CI_COMMIT_TAG}.zip melomelon-chrome-extension
+  after_script:
+    - echo "JOB_ID=$CI_JOB_ID" >> job.env
+  artifacts:
+     paths:
+       - release-${CI_COMMIT_TAG}.zip
+     expire_in: never
+     reports:
+       dotenv: job.env
+
+release:
+  stage: release
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  script:
+    - |
+      release-cli create --name "Release $CI_COMMIT_TAG" --tag-name $CI_COMMIT_TAG \
+        --assets-link "{\"name\":\"release-${CI_COMMIT_TAG}.zip\",\"url\":\"https://framagit.org/adfaure/melomelon/-/jobs/${JOB_ID}/artifacts/raw/release-${CI_COMMIT_TAG}.zip\"}"
   rules:
     - if: $CI_COMMIT_TAG
-  script:
-    - echo 'running release_job for $CI_COMMIT_TAG'
-  release:
-    name: 'Release $CI_COMMIT_TAG'
-    description: 'Created using the release-cli $EXTRA_DESCRIPTION'
-    tag_name: '$CI_COMMIT_TAG'
-    ref: '$CI_COMMIT_SHA'
-  artifacts:
-    when: always
-    expire_in: 8 hours
-    paths:
-      - melomelon-chrome-extension
