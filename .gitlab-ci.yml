@@ -31,6 +31,6 @@ release_job:
     - echo 'running release_job for $TAG'
   release:
     name: 'Release $TAG'
-    description: 'Created using the release-cli $EXTRA_DESCRIPTION'  # $EXTRA_DESCRIPTION and the $TAG
-    tag_name: '$TAG'                                                 # variables must be defined elsewhere
-    ref: '$CI_COMMIT_SHA'                                            # in the pipeline. For example, in the
+    description: 'Created using the release-cli $EXTRA_DESCRIPTION'
+    tag_name: '$TAG'
+    ref: '$CI_COMMIT_SHA'
