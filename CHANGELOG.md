@@ -1,10 +1,13 @@
-## [Unreleased]
+[Unreleased]
+============
 
-## [1.0.0]
+[1.0.0]
+=======
 
 - Release date: 2021-14-10
 
-### Added
+Added
+-----
 
 - MIT LICENSE
 - The chrome extension
@@ -15,8 +18,11 @@
 - Keep a Changelog: http://keepachangelog.com/en/1.0.0/
 - Semantic Versioning: http://semver.org/spec/v2.0.0.html
 
-### Changed
+Changed
+-------
 
-### Removed
+Removed
+-------
 
-### Fixed
+Fixed
+-----
