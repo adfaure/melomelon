@@ -56,3 +56,19 @@ It should open a tab that will be handled by the extension. Whenever a viewer us
 Once you have a tab opened, you can go back to the extension popup and connect the extension to twitch (button *Start bot*).
 
 **Due to some limitation with chrome extension, you need to keep the YouTube tab opened, otherwise the extension will disconnect the twitch bot after some time.**
+
+## Release
+
+### Generate the package
+
+To build the packaging files, use node2nix.
+
+```
+node2nix -c release.nix
+```
+
+It should generate three files:
+
+- node-env.nix
+- node-packages.nix
+- release.nix
