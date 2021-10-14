@@ -37,4 +37,7 @@ release_job:
     tag_name: '$CI_COMMIT_TAG'
     ref: '$CI_COMMIT_SHA'
   artifacts:
-  - melomelon-chrome-extension
+    when: always
+    expire_in: 8 hours
+    paths:
+      - melomelon-chrome-extension
