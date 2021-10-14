@@ -7,7 +7,7 @@ var webpack = require("webpack"),
   HtmlWebpackPlugin = require("html-webpack-plugin"),
   MiniCssExtractPlugin = require('mini-css-extract-plugin'),
   // WriteFilePlugin = require("write-file-webpack-plugin");
- { VueLoaderPlugin } = require('vue-loader');
+  { VueLoaderPlugin } = require('vue-loader');
 
 var fileExtensions = ["jpg", "jpeg", "png", "gif", "eot", "otf", "svg", "ttf", "woff", "woff2", "css"];
 
@@ -74,6 +74,12 @@ var options = {
         { from: "src/manifest.json", to: "." },
       ],
     }),
+    // Copy manifest icons
+    new CopyPlugin({
+      patterns: [
+        { from: "src/images/", to: "." },
+      ],
+    }),
     new HtmlWebpackPlugin({
       template: path.join(__dirname, "src", "html", "popup.html"),
       filename: "popup.html",
@@ -93,18 +99,6 @@ var options = {
       filename: 'css/style.css'
     }),
     new VueLoaderPlugin()
-
-    // new HtmlWebpackPlugin({
-    //   template: path.join(__dirname, "src", "options.html"),
-    //   filename: "options.html",
-    //   chunks: ["options"]
-    // }),
-    // new HtmlWebpackPlugin({
-    //   template: path.join(__dirname, "src", "background.html"),
-    //   filename: "background.html",
-    //   chunks: ["background"]
-    // }),
-    // new WriteFilePlugin()
   ]
 };
 
