@@ -4,23 +4,10 @@
 -->
 <template>
   <div class="content">
-    <p class="title is-3">Youtube</p>
     <p v-if="tabId != 0" class="subtitle is-5">
       <strong>Playing</strong>: {{ title }}
     </p>
 
-    <div v-if="tabId != 0" class="field is-grouped">
-      <p class="control">
-        <button class="button is-light is-info" v-on:click="gotToControlledTab">Go to controlled tab</button>
-      </p>
-      <p class="control">
-        <button class="button is-light is-danger" v-on:click="stopControlledTab">Stop youtube</button>
-      </p>
-    </div>
-
-    <div v-else class="control block">
-      <button class="button" v-on:click="startControlledTab">Open youtube</button>
-    </div>
   </div>
 </template>
 
@@ -43,11 +30,6 @@
           })
         }
       });
-
-      chrome.tabs.onRemoved.addListener(function (tabId, changeInfo, tab) {
-        self.tab = null;
-      })
-
     },
     methods: {
       gotToControlledTab: function (event) {

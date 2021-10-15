@@ -12,15 +12,6 @@
         </div>
       </div>
       <section class="section content">
-        <p class="title is-1"> Song history </p>
-        <p class="subtitle is-3"> History of the current session </p>
-        <ul>
-          <li v-for="song in song_history">
-            {{ song.title }} (<a v-bind:href="song.url">link</a>)
-          </li>
-        </ul>
-      </section>
-      <section class="section content">
         <p class="title is-1"> Song stats </p>
         <table class="table">
           <thead>

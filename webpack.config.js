@@ -25,6 +25,7 @@ var options = {
     // popup: path.join(__dirname, "src", "js", "popup.js"),
     popup: path.join(__dirname, "src", "js", "popup.js"),
     settings: path.join(__dirname, "src", "js", "settings.js"),
+    bot: path.join(__dirname, "src", "js", "bot.js"),
     background: path.join(__dirname, "src", "js", "background.js"),
     stats: path.join(__dirname, "src", "js", "stats.js")
 

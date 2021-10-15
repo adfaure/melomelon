@@ -5,14 +5,12 @@
 -->
 <template>
   <div class="content">
-    <p class="title is-3">
-      Twitch bot
-    </p>
-    <p class="subtitle is-5">
-      <strong>status</strong>: {{ status }}
-    </p>
-    <div v-if="status !== 'online' && status !== 'connecting'">
 
+    <p class="title is-5">
+      <strong>Twitch status</strong>: {{ status }}
+    </p>
+
+    <div v-if="status !== 'online' && status !== 'connecting'">
       <div v-if="status === 'error'" class="block notification is-danger">
         <p class="block">
           Could not connect: <strong>{{ error_msg }}</strong>.
@@ -21,69 +19,134 @@
           Open the settings page to update the configuration.
         </p>
       </div>
-
       <div class="control block">
-        <button class="button" v-on:click="startBot">Start bot</button>
+        <button class="button" v-on:click="startControlledTab">Start bot</button>
       </div>
-
     </div>
-    <div v-else-if="status === 'online'">
+    <div v-else-if="tabId != 0 && status === 'online'">
       <ul>
+        <li v-if="tabId != 0">
+          <strong>Playing</strong>: {{ title }}
+        </li>
         <li><strong>Connected as:</strong> {{ username }} on channel {{ channel }}</li>
-        <li><strong>Polled counter: </strong> {{ nb_time_asked }}</li>
       </ul>
-      <p v-if="status == 'online' && !youtube_handled" class="notification is-warning box">
-        The bot is connected to twitch, however the youtube tab is not opened yet.
-        Due to some limitations with chrome extensions, the connection will be closed soon unless you open youtube with
-        the extension (by clicking on "open youtube").
-      </p>
+      <div class="field is-grouped">
+        <p class="control">
+          <button class="button is-light is-info" v-on:click="gotToControlledTab">Go to controlled tab</button>
+        </p>
+        <p class="control">
+          <button class="button is-light is-danger" v-on:click="stopControlledTab">Stop bot</button>
+        </p>
+      </div>
     </div>
+
   </div>
 </template>
 
 <script>
+
   export default {
     name: 'twitch',
     data() {
       return {
+        tabId: 0,
+        title: '',
         botname: '',
         username: '',
         channel: '',
-        status: "offline",
-        youtube_handled: false,
-        nb_time_asked: 0
+        status: 'offline',
+        error_msg: ''
       }
     },
-    mounted: function () {
+    mounted: async function () {
       var self = this;
-      chrome.runtime.sendMessage({ type: "send-status" }, function (result) {
-        if (result && result["twitch_client"] && result["connected"]) {
-          console.log(result)
-          self.status = result["connected"];
-          self.username = result["twitch_client"].username
-          self.channel = result["twitch_client"].channels[0]
-          self.youtube_handled = result["youtube_handled"]
-          self.nb_time_asked = result["nb_time_asked"]
-        }
-      });
+      this.update();
+      this.waitConnection()
     },
-    methods: {
-      startBot: function (event) {
-        self = this;
-        self.status = "connecting";
 
-        chrome.runtime.sendMessage({ type: "connect-to-chat" }, function (result) {
-          if (result["error"] != null) {
-            console.log("connection error", result)
-            self.error_msg = result.error;
-            self.status = "error";
-          } else if (result["state"] && result["state"]["twitch_client"]) {
-            var state = result["state"]
-            self.username = state["twitch_client"].username
-            self.channel = state["twitch_client"].channels[0]
-            self.youtube_handled = state["youtube_handled"]
-            self.status = "online";
+    methods: {
+      update: async function (event) {
+        var self = this;
+        chrome.runtime.sendMessage({ type: "send-status" }, function (bgResult) {
+          var lastError = chrome.runtime.lastError;
+          if (lastError) {
+            console.log("Cannot contact BG");
+            return;
           }
+
+          if (bgResult["tab"] != null) {
+            chrome.tabs.sendMessage(bgResult["tab"], { type: "send-status" }, function (tabResult) {
+              var lastError = chrome.runtime.lastError;
+              if (lastError) {
+                console.log("Cannot contact CS");
+                return;
+              }
+
+              if (tabResult && tabResult["twitch_client"] && tabResult["connected"]) {
+                self.status = tabResult["connected"];
+                if (tabResult["connected"] == 'error') {
+                  self.error_msg = tabResult["error_msg"]
+                } else {
+                  self.username = tabResult["twitch_client"].username
+                  self.channel = tabResult["twitch_client"].channels[0]
+                }
+              }
+            });
+
+            chrome.tabs.get(bgResult["tab"], (tab) => {
+              self.title = tab.title;
+              self.tabId = tab.id;
+            })
+          }
+        });
+      },
+      waitConnection: function () {
+        console.log("Wait connection", this);
+        var self = this;
+
+        setTimeout(() => {
+          if (this.tabId != 0 && (this.status == 'connecting' || this.status == 'offline') && !this.error_msg) {
+            console.log("Restart waiting!");
+            this.update()
+            self.waitConnection()
+          }
+        }, 100)
+      },
+      gotToControlledTab: function (event) {
+        chrome.tabs.update(this.tabId, { selected: true });
+      },
+      startControlledTab: function (event) {
+        self = this;
+        chrome.runtime.sendMessage({ type: "open-youtube" }, function (result) {
+          var lastError = chrome.runtime.lastError;
+          if (lastError) {
+            console.log("Cannot contact BG");
+            return;
+          }
+
+          if (result && result["error"]) {
+            console.log(result["error"]);
+            throw result["error"];
+          } else if (result && result["state"] && result["state"]["tab"]) {
+            var state = result["state"]
+            chrome.tabs.get(state["tab"], (tab) => {
+              self.title = tab.title;
+              self.tabId = tab.id;
+            })
+          }
+        });
+      },
+      stopControlledTab: function (event) {
+        self = this;
+        chrome.runtime.sendMessage({ type: "close-youtube" }, function (result) {
+          var lastError = chrome.runtime.lastError;
+          if (lastError) {
+            console.log("Cannot contact CS");
+            return;
+          }
+
+          self.title = "";
+          self.tabId = 0;
         });
       }
     }
