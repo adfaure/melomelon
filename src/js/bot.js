@@ -19,7 +19,6 @@ chrome.runtime.onMessage.addListener(
 
   // Principal listener used by the popup to control the extension
   function (request, sender, sendResponse) {
-    console.log("MESSAGE!", request)
     switch (request.type) {
 
       case 'alive':

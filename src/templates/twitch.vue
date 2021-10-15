@@ -20,7 +20,7 @@
         </p>
       </div>
       <div class="control block">
-        <button class="button" v-on:click="startControlledTab">Start bot</button>
+        <button class="button is-primary" v-on:click="startControlledTab">Start bot</button>
       </div>
     </div>
     <div v-else-if="tabId != 0 && status === 'online'">
