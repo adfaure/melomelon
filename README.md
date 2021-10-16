@@ -16,7 +16,7 @@ npx webpack-cli -c webpack.config.js
 
 ### Download
 
-Download the extension [wip].
+Download the extension [release 2.0.1](https://framagit.org/adfaure/melomelon/-/jobs/1464820/artifacts/raw/release-v2.0.1.zip).
 
 ### Install the chrome extension
 
