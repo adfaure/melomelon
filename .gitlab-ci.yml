@@ -49,10 +49,6 @@ prepare:release:
 release:
   stage: release
   image: registry.gitlab.com/gitlab-org/release-cli:latest
-  script:
-    - |
-      release-cli create --name "Release $CI_COMMIT_TAG" --tag-name $CI_COMMIT_TAG \
-        --assets-link "{\"name\":\"\",\"url\":\"\"}"
   rules:
     - if: $CI_COMMIT_TAG
   assets:
