@@ -6,9 +6,9 @@
 <template>
   <div class="content">
 
-    <p class="title is-5">
+    <h1 class="title is-5">
       <strong>Twitch status</strong>: {{ status }}
-    </p>
+    </h1>
 
     <div v-if="status !== 'online' && status !== 'connecting'">
       <div v-if="status === 'error'" class="block notification is-danger">

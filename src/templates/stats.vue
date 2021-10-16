@@ -12,7 +12,7 @@
         </div>
       </div>
       <section class="section content">
-        <p class="title is-1"> Song stats </p>
+        <h1 class="title is-1"> Song stats </h1>
         <table class="table">
           <thead>
             <tr>
