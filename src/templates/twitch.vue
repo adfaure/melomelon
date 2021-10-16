@@ -28,7 +28,7 @@
         <li v-if="tabId != 0">
           <strong>Playing</strong>: {{ title }}
         </li>
-        <li><strong>Connected as:</strong> {{ username }} on channel {{ channel }}</li>
+        <li v-if="status == 'online' && username && channel "><strong>Connected as:</strong> {{ username }} on channel {{ channel }}</li>
       </ul>
       <div class="field is-grouped">
         <p class="control">
