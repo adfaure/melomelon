@@ -88,7 +88,10 @@
                 self.status = tabResult["connected"];
                 if (tabResult["connected"] == 'error') {
                   self.error_msg = tabResult["error_msg"]
-                } else {
+                } else if(tabResult["twitch_client"] &&
+                          tabResult["twitch_client"].username &&
+                          tabResult["twitch_client"].channels[0]) {
+
                   self.username = tabResult["twitch_client"].username
                   self.channel = tabResult["twitch_client"].channels[0]
                 }

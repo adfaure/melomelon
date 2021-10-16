@@ -19,8 +19,6 @@ document.addEventListener('DOMContentLoaded', async function (event) {
   var submitCommands = document.getElementById('submit-commands');
   var clearCommands = document.getElementById('clear-commands');
   var commandList = document.getElementById('commands-list');
-  var keepAlive = document.getElementById('keep-alive');
-  var keepAliveAlert = document.getElementById('keep-alive-alert')
 
   await chrome.storage.local.get(['bot-token', 'bot-channel', 'bot-username', 'chat-commands'], function(result) {
     if(result["bot-token"]) {
@@ -61,31 +59,16 @@ document.addEventListener('DOMContentLoaded', async function (event) {
 
   // onClick's logic below:
   submitCommands.addEventListener('click', function () {
-    var timeout = parseInt(keepAlive.value);
-
-    if (timeout > 295) {
-      timeout = 295;
-      keepAliveAlert.classList.remove("is-hidden")
-      return
-    }
-
-    if(!keepAliveAlert.classList.contains("is-hidden")) {
-      keepAliveAlert.classList.add("is-hidden")
-    }
-
     chrome.storage.local.set({
       "chat-commands": commandList.value,
-      "keepalive-timeout": timeout
     })
   })
 
   clearCommands.addEventListener('click', function () {
     chrome.storage.local.set({
       "chat-commands": null,
-      "keepalive-timeout": 295
     }, function() {
       commandList.value = null;
-      keepAlive.value = 295;
     })
   })
 
