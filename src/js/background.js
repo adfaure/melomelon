@@ -136,7 +136,7 @@ chrome.runtime.onMessage.addListener(
             chrome.storage.local.get({ tab: null })
             console.log("A tab is already up, removing")
             chrome.tabs.remove(result["tab"]).then(() => {
-              sendResponse({ tab: result["tab"] });
+              sendResponse({ tab: null });
             })
           }
         })

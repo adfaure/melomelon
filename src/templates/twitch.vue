@@ -28,7 +28,8 @@
         <li v-if="tabId != 0">
           <strong>Playing</strong>: {{ title }}
         </li>
-        <li v-if="status == 'online' && username && channel "><strong>Connected as:</strong> {{ username }} on channel {{ channel }}</li>
+        <li v-if="status == 'online' && username && channel "><strong>Connected as:</strong> {{ username }} on channel
+          {{ channel }}</li>
       </ul>
       <div class="field is-grouped">
         <p class="control">
@@ -88,9 +89,9 @@
                 self.status = tabResult["connected"];
                 if (tabResult["connected"] == 'error') {
                   self.error_msg = tabResult["error_msg"]
-                } else if(tabResult["twitch_client"] &&
-                          tabResult["twitch_client"].username &&
-                          tabResult["twitch_client"].channels[0]) {
+                } else if (tabResult["twitch_client"] &&
+                  tabResult["twitch_client"].username &&
+                  tabResult["twitch_client"].channels[0]) {
 
                   self.username = tabResult["twitch_client"].username
                   self.channel = tabResult["twitch_client"].channels[0]
@@ -102,6 +103,9 @@
               self.title = tab.title;
               self.tabId = tab.id;
             })
+          } else {
+            this.tab = 0;
+            this.Status = 'offline'
           }
         });
       },
@@ -141,16 +145,21 @@
         });
       },
       stopControlledTab: function (event) {
-        self = this;
-        chrome.runtime.sendMessage({ type: "close-youtube" }, function (result) {
+        chrome.runtime.sendMessage({ type: "close-youtube" }, (result) => {
           var lastError = chrome.runtime.lastError;
           if (lastError) {
             console.log("Cannot contact CS");
             return;
           }
 
-          self.title = "";
-          self.tabId = 0;
+          this.title = "";
+          this.tabId = 0;
+          this.status = "offline";
+
+          setTimeout(() => {
+            this.update()
+          }, 100)
+
         });
       }
     }
