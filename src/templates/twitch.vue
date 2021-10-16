@@ -52,7 +52,7 @@
         tabId: 0,
         title: '',
         botname: '',
-        username: '',
+        username: null,
         channel: '',
         status: 'offline',
         error_msg: ''
@@ -107,13 +107,12 @@
       },
       waitConnection: function () {
         console.log("Wait connection", this);
-        var self = this;
-
         setTimeout(() => {
-          if (this.tabId != 0 && (this.status == 'connecting' || this.status == 'offline') && !this.error_msg) {
+          console.log(this.username)
+          if (this.tabId != 0 && (this.status == 'connecting' || this.status == 'offline' || !this.username) && !this.error_msg) {
             console.log("Restart waiting!");
             this.update()
-            self.waitConnection()
+            this.waitConnection()
           }
         }, 100)
       },
