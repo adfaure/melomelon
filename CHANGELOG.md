@@ -1,4 +1,4 @@
-[Unreleased]
+[unreleased]
 ============
 
 Added
@@ -13,8 +13,25 @@ Removed
 Fixed
 -----
 
+[2.0.1]
+=======
+
+Added
+-----
+
+Changed
+-------
+
+Removed
+-------
+
+Fixed
+-----
+
+- Fix assert condition in update state
+
 [2.0.0]
-============
+=======
 
 Added
 -----
