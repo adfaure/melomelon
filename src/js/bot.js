@@ -1,4 +1,11 @@
+// Content script.
+// This script is started by the background script on the tab controlled by the extension.
+// It caonnects to twitch irc, and responds to commands in `commands_list`.
+// If the bot is playing a youtube video, the title and the url of the video is send to
+// the chat.
+
 const twitch = require('./twitch.js');
+const utils = require('./utils.js');
 
 // Global variables, this is the state of the service
 youtube_handled = false
@@ -68,35 +75,10 @@ chrome.runtime.onMessage.addListener(
   }
 );
 
+// Onwe we registred eventlisteners, we notify the background script
+// that we are alive.
 var port = chrome.runtime.connect({ name: "rendez-vous" });
 port.postMessage({});
-
-// Update polled and history stats in local storage
-function updateStats(tab, title, action) {
-  chrome.storage.local.get(["stats"], (result) => {
-    var stats = {};
-    if (result["stats"] == null) {
-      stats = {};
-    } else {
-      stats = result["stats"];
-    }
-
-    if (stats[title] == null) {
-      stats[title] = {
-        url: tab.url,
-        raw_title: tab.title,
-      };
-      stats[title][action] = 1;
-    } else if (stats[title][action] == null) {
-      stats[title][action] = 1;
-    } else {
-      stats[title][action]++;
-    }
-
-    chrome.storage.local.set({ "stats": stats })
-  })
-}
-
 
 // Called every time a chat message comes in
 // This is the twitch part, it processes chat messages and respond to
@@ -117,7 +99,7 @@ function onMessageHandler(target, context, msg, self) {
         if (match != null) {
           twitch_client.say(target, `${match[1]} (${result.tab.url})`);
           // Update the local storage stats
-          updateStats(result.tab, match[1], "polled");
+          utils.updateStats(result.tab, match[1], "polled");
         } else {
           twitch_client.say(target, `No song is playing right now.`);
         }
@@ -128,7 +110,7 @@ function onMessageHandler(target, context, msg, self) {
   }
 }
 
-// /*// Return the current state
+// Return the current state
 function getState() {
   var current_time = new Date().getTime();
 

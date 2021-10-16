@@ -1,20 +1,20 @@
 /*
   Main script of the extension.
 
-  It is a stateful service that maintains a two states:
-  - A connection to twitch to respond to chat commands;
-  - A chrome tab that will be tracked, to send information to the twitch chat.
-
-  Due to some chrome extension limitations, the end of the script is dedicated to a hack
-  that is able to maintain this service alive when the YouTube tab is opened.
+  This script is responsible to manage the state of the extension. Dude to
+  limitations of chrome extension, it is stateless and keep it states
+  into the local storage. The state is the id of the controlled YouTube
+  tab.
 
   The script doesn't track or get information from any other tabs.
 */
 
+const utils = require('./utils.js');
+
 error_msg = null;
 
 // Listen to removed tabs, to detect if the user close the
-// tab listen in this script.
+// tab.
 chrome.tabs.onRemoved.addListener(function (tabId, changeInfo, tab) {
   chrome.storage.local.get(["tab"], (result) => {
     console.log("YouTube tab closed");
@@ -24,8 +24,25 @@ chrome.tabs.onRemoved.addListener(function (tabId, changeInfo, tab) {
   })
 })
 
+
+// Listen to tabs changes.
+// 1. We update the song history
+// 2. If the user manually changes the url of the controlled tab, the content_script stops
+//    causing twitch to disconnect too. In that case we just restart the content script.
+//    Beforehand, we start a connection port to ensure, that the script is deconnected,
+//    if the content script still lives, we do nothing.
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
   chrome.storage.local.get(["tab"], (result) => {
+
+    if(result.tab == tabId && changeInfo.title) {
+      // We prevent from saving tabs opening the youtube index
+      var matchTitle = tab.title.match(/(^.*?) - YouTube$/);
+
+      if (matchTitle != null) {
+        utils.updateStats(tab, matchTitle[1], "playing");
+      }
+    }
+
     // Status complete should be called once
     if (result.tab == tabId && changeInfo.status == "complete") {
       console.log("Receive complete!");
@@ -43,6 +60,11 @@ chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
   })
 });
 
+
+// Listen to incoming port connections.
+// When a content script starts, it will connect to this background script
+// with the port named 'rendez-vous'. When it is donne, ask the content script to
+// connect to twitch irc.
 chrome.runtime.onConnect.addListener(function (port) {
   if (port.name === 'rendez-vous' && port.sender && port.sender.tab) {
     port.onMessage.addListener(function (msg) {
@@ -55,6 +77,7 @@ chrome.runtime.onConnect.addListener(function (port) {
   }
 });
 
+// Start the content script in `tabId`.
 async function startBot(tabId) {
   chrome.tabs.get(tabId).then(async function (tab) {
     try {
@@ -67,18 +90,11 @@ async function startBot(tabId) {
 
       return;
     } catch (e) {
-      console.log("start bot!", e)
+      console.log("Could not start bot: ", e)
     }
-    console.log("add listener to retry")
   });
 }
 
-function retry(tabId, info, tab) {
-  if (info.url && /^(file|https?):/.test(info.url)) {
-    console.log("retry!", info);
-    startBot(tabId);
-  }
-}
 
 // Main way to access to this script from other place of the extension.
 // The other components of the extension (the popup, states etc)
