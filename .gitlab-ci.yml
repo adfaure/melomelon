@@ -35,8 +35,8 @@ prepare_release:
     - apk --no-cache add zip
   script:
     - echo "Zip file"
-    - mv  melomelon-chrome-extension release-${CI_COMMIT_TAG}
-    - zip -r release-${CI_COMMIT_TAG}.zip release-${CI_COMMIT_TAG}
+    - mv  melomelon-chrome-extension melomelon-${CI_COMMIT_TAG}
+    - zip -r release-${CI_COMMIT_TAG}.zip melomelon-${CI_COMMIT_TAG}
   after_script:
     - echo "JOB_ID=$CI_JOB_ID" >> job.env
   artifacts:

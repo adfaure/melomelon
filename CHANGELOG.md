@@ -4,6 +4,21 @@
 Added
 -----
 
+Changed
+-------
+
+Removed
+-------
+
+Fixed
+-----
+
+[2.0.0]
+============
+
+Added
+-----
+
 - A message is displayed when no song is playing
 - Single button to start the bot
   - It opens a youtube tab
