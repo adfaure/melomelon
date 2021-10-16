@@ -11,8 +11,6 @@
 
 const utils = require('./utils.js');
 
-error_msg = null;
-
 // Listen to removed tabs, to detect if the user close the
 // tab.
 chrome.tabs.onRemoved.addListener(function (tabId, changeInfo, tab) {

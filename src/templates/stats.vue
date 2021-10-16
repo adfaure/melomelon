@@ -16,18 +16,20 @@
         <table class="table">
           <thead>
             <tr>
-              <th><abbr title="Song Title">Song title</abbr></th>
-              <th><abbr title="Number of time the streamer listened to this song">Number of time Played</abbr></th>
-              <th><abbr title="Number of time asked by chat">Number of time asked</abbr></th>
+              <th v-bind:class="[sortedBy == 'title' ? 'is-primary' : 'is-link' ]" v-on:click="sortTitle" class="notification is-light"><abbr title="Song Title">Song
+                  title</abbr></th>
+              <th v-bind:class="[sortedBy == 'playing' ? 'is-primary' :  'is-link' ]" v-on:click="sortPlayed" class="notification is-light"><abbr
+                  title="Number of time the streamer listened to this song">Number of time Played</abbr></th>
+              <th v-bind:class="[sortedBy == 'polled' ? 'is-primary' :  'is-link' ]" v-on:click="sortAsked" class="notification is-light"><abbr title="Number of time asked by chat">Number of time asked</abbr></th>
               <th><abbr title="Youtube link">Link</abbr></th>
             </tr>
           </thead>
-          <tbody v-for="(nb, song) in stats" :key="song">
+          <tbody v-for="[key, values] in stats" :key="key">
             <tr>
-              <th>{{ song }}</th>
-              <td>{{ nb["playing"] }}</td>
-              <td>{{ nb["polled"] }}</td>
-              <td><a v-bind:href="nb['url']">{{ nb['url'] }}</a></td>
+              <th>{{ key }}</th>
+              <td>{{ values["playing"] }}</td>
+              <td>{{ values["polled"] }}</td>
+              <td><a v-bind:href="values['url']">{{ values['url'] }}</a></td>
             </tr>
           </tbody>
         </table>
@@ -45,35 +47,53 @@
 
   // Needs to be bounded
   function refreshPage() {
-    console.log("refreshing", this)
-    var self = this;
-    chrome.runtime.sendMessage({ type: "send-status" }, function (result) {
-      console.log(result)
-      self.song_history = result["history"];
-    });
 
     chrome.storage.local.get(["stats"], (result) => {
       console.log("polls", result)
       if (result["stats"]) {
-        self.stats = result["stats"];
+        console.log(result["stats"])
+        this.stats = Object.entries(result["stats"]);
+        this.stats.sort((a, b) => {
+          console.log(a)
+          return b[1].playing - a[1].playing;
+        })
       } else {
-        self.stats = {};
+        this.stats = {};
       }
     })
+
   };
 
   export default {
     name: 'app',
     data() {
       return {
-        song_history: [],
-        stats: {}
+        stats: {},
+        sortedBy: 'playing'
       }
     },
     mounted: function () {
       refreshPage.bind(this)();
     },
     methods: {
+      sortAsked: function (event) {
+        this.stats.sort((a, b) => {
+          return b[1].polled - a[1].polled;
+        })
+        this.sortedBy = 'polled';
+      },
+      sortTitle: function (event) {
+        this.stats.sort((a, b) => {
+          return a[0].localeCompare(b[0]);
+        })
+        this.sortedBy = 'title';
+      },
+      sortPlayed: function (event) {
+        this.stats.sort((a, b) => {
+          return b[1].playing - a[1].playing;
+        })
+        this.sortedBy = 'playing';
+      },
       refreshPage: function () { refreshPage.bind(this)(); },
       clearStats: function () {
         chrome.storage.local.set({ stats: null }, refreshPage.bind(this))
