@@ -23,7 +23,7 @@ build_and_test:
       - melomelon-chrome-extension
 
 # https://stackoverflow.com/a/67583488/3849997
-prepare:release:
+prepare_release:
   stage: prepare_release
   rules:
     - if: $CI_COMMIT_TAG
@@ -46,11 +46,14 @@ prepare:release:
      reports:
        dotenv: job.env
 
-release:
+release_job:
   stage: release
   image: registry.gitlab.com/gitlab-org/release-cli:latest
   rules:
     - if: $CI_COMMIT_TAG
+  needs:
+    - job: prepare_release
+      artifacts: true
   script:
     - echo 'running release_job for tag: ${CI_COMMIT_TAG}'
   release:
