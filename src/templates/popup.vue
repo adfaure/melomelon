@@ -24,13 +24,11 @@
 
 <script>
   import componentTwitch from '../templates/twitch.vue'
-  import componentYoutube from '../templates/youtube.vue'
 
   export default {
     name: 'app',
     components: {
       'component-twitch': componentTwitch,
-      'component-youtube': componentYoutube,
     },
     mounted: function () {
     },

@@ -74,6 +74,7 @@
             return;
           }
 
+          console.log("status from bg: ", bgResult);
           if (bgResult["tab"] != null) {
             chrome.tabs.sendMessage(bgResult["tab"], { type: "send-status" }, function (tabResult) {
               var lastError = chrome.runtime.lastError;
@@ -82,7 +83,8 @@
                 return;
               }
 
-              if (tabResult && tabResult["twitch_client"] && tabResult["connected"]) {
+              console.log("status from cs: ", tabResult);
+              if (tabResult && tabResult["connected"]) {
                 self.status = tabResult["connected"];
                 if (tabResult["connected"] == 'error') {
                   self.error_msg = tabResult["error_msg"]

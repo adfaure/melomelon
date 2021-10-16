@@ -57,7 +57,7 @@ chrome.runtime.onMessage.addListener(
                 sendResponse(getState())
               })
             } else {
-              connected = "offline";
+              connected = "error";
               error_msg = "Missing connection information";
               sendResponse(getState());
             }
