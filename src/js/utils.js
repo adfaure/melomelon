@@ -1,6 +1,6 @@
 module.exports = {
     updateStats: function (tab, title, action) {
-        console.assert(action == "played" && action == "polled");
+        console.assert(action == "played" || action == "polled");
 
         chrome.storage.local.get(["stats"], (result) => {
             var stats = {};
