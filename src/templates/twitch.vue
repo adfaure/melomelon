@@ -6,7 +6,10 @@
 <template>
   <div class="content">
 
-    <h1 class="title is-5">
+    <h1 v-if="tabState == 'loading'" class="title is-5">
+      <strong>Loading YouTube</strong>
+    </h1>
+    <h1 v-else class="title is-5">
       <strong>Twitch status</strong>: {{ status }}
     </h1>
 
@@ -19,7 +22,7 @@
           Open the settings page to update the configuration.
         </p>
       </div>
-      <div class="control block">
+      <div v-else-if="tabId == 0" class="control block">
         <button class="button is-primary" v-on:click="startControlledTab">Start bot</button>
       </div>
     </div>
@@ -51,8 +54,8 @@
     data() {
       return {
         tabId: 0,
+        tabState: null,
         title: '',
-        botname: '',
         username: null,
         channel: '',
         status: 'offline',
@@ -67,8 +70,7 @@
 
     methods: {
       update: async function (event) {
-        var self = this;
-        chrome.runtime.sendMessage({ type: "send-status" }, function (bgResult) {
+        chrome.runtime.sendMessage({ type: "send-status" }, (bgResult) => {
           var lastError = chrome.runtime.lastError;
           if (lastError) {
             console.log("Cannot contact BG");
@@ -77,7 +79,7 @@
 
           console.log("status from bg: ", bgResult);
           if (bgResult["tab"] != null) {
-            chrome.tabs.sendMessage(bgResult["tab"], { type: "send-status" }, function (tabResult) {
+            chrome.tabs.sendMessage(bgResult["tab"], { type: "send-status" }, (tabResult) => {
               var lastError = chrome.runtime.lastError;
               if (lastError) {
                 console.log("Cannot contact CS");
@@ -86,22 +88,22 @@
 
               console.log("status from cs: ", tabResult);
               if (tabResult && tabResult["connected"]) {
-                self.status = tabResult["connected"];
+                this.status = tabResult["connected"];
                 if (tabResult["connected"] == 'error') {
-                  self.error_msg = tabResult["error_msg"]
+                  this.error_msg = tabResult["error_msg"]
                 } else if (tabResult["twitch_client"] &&
                   tabResult["twitch_client"].username &&
                   tabResult["twitch_client"].channels[0]) {
-
-                  self.username = tabResult["twitch_client"].username
-                  self.channel = tabResult["twitch_client"].channels[0]
+                  this.username = tabResult["twitch_client"].username
+                  this.channel = tabResult["twitch_client"].channels[0]
                 }
               }
             });
 
             chrome.tabs.get(bgResult["tab"], (tab) => {
-              self.title = tab.title;
-              self.tabId = tab.id;
+              this.tabState = tab.status;
+              this.title = tab.title;
+              this.tabId = tab.id;
             })
           } else {
             this.tab = 0;
@@ -118,29 +120,17 @@
             this.update()
             this.waitConnection()
           }
-        }, 100)
+        }, 1000)
       },
       gotToControlledTab: function (event) {
         chrome.tabs.update(this.tabId, { selected: true });
       },
       startControlledTab: function (event) {
-        self = this;
-        chrome.runtime.sendMessage({ type: "open-youtube" }, function (result) {
+        chrome.runtime.sendMessage({ type: "open-youtube" }, (result) => {
           var lastError = chrome.runtime.lastError;
           if (lastError) {
             console.log("Cannot contact BG");
             return;
-          }
-
-          if (result && result["error"]) {
-            console.log(result["error"]);
-            throw result["error"];
-          } else if (result && result["state"] && result["state"]["tab"]) {
-            var state = result["state"]
-            chrome.tabs.get(state["tab"], (tab) => {
-              self.title = tab.title;
-              self.tabId = tab.id;
-            })
           }
         });
       },

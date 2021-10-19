@@ -27,7 +27,7 @@ chrome.tabs.onRemoved.addListener(function (tabId, changeInfo, tab) {
 // 1. We update the song history
 // 2. If the user manually changes the url of the controlled tab, the content_script stops
 //    causing twitch to disconnect too. In that case we just restart the content script.
-//    Beforehand, we start a connection port to ensure, that the script is deconnected,
+//    Beforehand, we start a connection port to ensure, that the script is disconnected,
 //    if the content script still lives, we do nothing.
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
   chrome.storage.local.get(["tab"], (result) => {
