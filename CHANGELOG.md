@@ -1,4 +1,4 @@
-[unreleased]
+[2.0.2]
 ============
 
 Added
@@ -6,6 +6,8 @@ Added
 
 Changed
 -------
+
+- Change icon color
 
 Removed
 -------
