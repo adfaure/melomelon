@@ -32,7 +32,7 @@ chrome.tabs.onRemoved.addListener(function (tabId, changeInfo, tab) {
 chrome.tabs.onUpdated.addListener(function (tabId, changeInfo, tab) {
   chrome.storage.local.get(["tab"], (result) => {
 
-    if(result.tab == tabId && changeInfo.title) {
+    if (result.tab == tabId && changeInfo.title) {
       // We prevent from saving tabs opening the youtube index
       var matchTitle = tab.title.match(/(^.*?) - YouTube$/);
 
@@ -147,16 +147,22 @@ chrome.runtime.onMessage.addListener(
       case 'send-status':
         console.log("Received send status");
 
-        chrome.storage.local.get(["tab"], (result) => {
-          if (result["tab"]) {
-            chrome.tabs.get(result["tab"]).then(function (tab) {
-              sendResponse({ tab: result["tab"] })
-            }).catch((e) => {
-              console.log("could not get tab", e);
-              sendResponse({ tab: null })
-            })
+        chrome.storage.local.get(['bot-token', 'bot-channel', 'bot-username', 'tab'], (result) => {
+          if (!result["bot-token"] || !result["bot-username"] || !result["bot-channel"]) {
+            error_msg = "Missing connection information";
+            sendResponse({error: error_msg, tab: null});
+          } else {
+            if (result["tab"]) {
+              chrome.tabs.get(result["tab"]).then(function (tab) {
+                sendResponse({ tab: result["tab"] })
+              }).catch((e) => {
+                console.log("could not get tab", e);
+                sendResponse({ tab: null })
+              })
+            }
           }
-        })
+        });
+
         return true;
         break;
 

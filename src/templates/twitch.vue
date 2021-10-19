@@ -13,7 +13,16 @@
       <strong>Twitch status</strong>: {{ status }}
     </h1>
 
-    <div v-if="status !== 'online' && status !== 'connecting'">
+    <div v-if="connectionInfoMissing" class="block notification is-info">
+      <p class="block">
+        No twitch login information.
+        Open the settings page to add your connection information.
+      </p>
+      <p class="control">
+        <button class="button is-light is-link is-small" v-on:click="openSettingsTab">Open settings</button>
+      </p>
+    </div>
+    <div v-else-if="status !== 'online' && status !== 'connecting'">
       <div v-if="status === 'error'" class="block notification is-danger">
         <p class="block">
           Could not connect: <strong>{{ error_msg }}</strong>.
@@ -59,16 +68,24 @@
         username: null,
         channel: '',
         status: 'offline',
-        error_msg: ''
+        error_msg: '',
+        connectionInfoMissing: false,
       }
     },
     mounted: async function () {
-      var self = this;
       this.update();
       this.waitConnection()
     },
 
     methods: {
+      openSettingsTab: function (event) {
+        chrome.tabs.create({ url: 'settings.html' }).then(
+          function (newTab) {
+            console.log(newTab);
+          }).catch(function (err) {
+            console.log(err);
+          });
+      },
       update: async function (event) {
         chrome.runtime.sendMessage({ type: "send-status" }, (bgResult) => {
           var lastError = chrome.runtime.lastError;
@@ -78,7 +95,9 @@
           }
 
           console.log("status from bg: ", bgResult);
-          if (bgResult["tab"] != null) {
+          if(bgResult["error"]) {
+            this.connectionInfoMissing = true;
+          } else if (bgResult["tab"] != null) {
             chrome.tabs.sendMessage(bgResult["tab"], { type: "send-status" }, (tabResult) => {
               var lastError = chrome.runtime.lastError;
               if (lastError) {
