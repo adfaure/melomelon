@@ -18,8 +18,8 @@
    width="49.283451"
    height="49.416035"
    inkscape:export-filename="/home/adfaure/Projects/melomelon/src/images/icon48.png"
-   inkscape:export-xdpi="87.879997"
-   inkscape:export-ydpi="87.879997"><metadata
+   inkscape:export-xdpi="93.5"
+   inkscape:export-ydpi="93.5"><metadata
    id="metadata87"><rdf:RDF><cc:Work
        rdf:about=""><dc:format>image/svg+xml</dc:format><dc:type
          rdf:resource="http://purl.org/dc/dcmitype/StillImage" /><dc:title></dc:title></cc:Work></rdf:RDF></metadata><defs
@@ -153,7 +153,9 @@
 </g>
 <g
    id="g1031"
-   transform="translate(-19.357243,73.437088)"><g
+   transform="translate(-19.357243,73.437088)"
+   inkscape:export-xdpi="93.5"
+   inkscape:export-ydpi="93.5"><g
      id="g979"
      transform="matrix(1.0222686,0,0,1.0180528,-21.309009,-4.0286024)"
      style="stroke-width:0.98024"><path
